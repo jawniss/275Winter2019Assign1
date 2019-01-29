@@ -1,12 +1,3 @@
-/*
-# ----------------------------------------------
-#   Name: Ricky Au
-#   ID: 1529429
-#   CMPUT 275, Winter 2018
-#
-#   Weekly Exercise 2 : Restaurants and Pointers getRestaurantFast
-# ----------------------------------------------
-*/
 
 #include <Arduino.h>
 #include <Adafruit_GFX.h>
@@ -52,6 +43,46 @@
 
 Adafruit_ILI9341 tft = Adafruit_ILI9341(TFT_CS, TFT_DC);
 
+
+#define JOY_VERT  A1
+#define JOY_HORIZ A0
+#define JOY_SEL   2
+
+#define JOY_CENTER   512
+#define JOY_DEADZONE 64
+
+// name testing
+#define NUM_NAMES 18
+
+const char *stringsToDisplay[] = {
+	"Zac", "Omid", "Veronica", "Zach", "Jason", "Joseph", "Arseniy",
+	"Daniel", "Mohammad", "Parash", "Everton", "Touqir", "Logan",
+	"A Very Long Name That Should Not Wrap Around", "A","B","C","D"
+  ,"E","F","G" // extra names
+}; uint16_t highlightedString; // indexes the above const char strings to display
+
+void drawName(uint16_t index){
+  tft.setCursor(0,index*15); // should be on the left each word is 8 bit high (its in the adafruit graphicks library) we want size 2 so 7*2 +1 which is white space 1
+
+  if(index == highlightedString){
+    tft.setTextColor(ILI9341_BLACK, ILI9341_WHITE); // black with white background
+  }else {
+    tft.setTextColor(ILI9341_WHITE, ILI9341_BLACK); // black with white background
+  }
+  tft.println(stringsToDisplay[index]);
+}
+// refresh the display and dispay all names
+// do not change the highlighred stirng
+void displayAllNames(){
+  tft.fillScreen(ILI9341_BLACK); // fill it in black
+
+  for (uint16_t i=0; i< NUM_NAMES; i++){ // loop thorugh all names and draw them Note it can only draw 15 names on the screen
+
+    drawName(i);
+  }
+}
+
+
 // a multimeter reading says there are 300 ohms of resistance across the plate,
 // so initialize with this to get more accurate readings
 TouchScreen ts = TouchScreen(XP, YP, XM, YM, 300);
@@ -83,66 +114,15 @@ void setup() {
 
   // tft display initialization
   tft.begin();
-  // set background to black
+
+  pinMode(JOY_SEL, INPUT_PULLUP);
   tft.fillScreen(ILI9341_BLACK);
-  // set rotation for wider screen
   tft.setRotation(3);
-  // initial screen when no button has been pressed yet
-  tft.setCursor(0,0);
-  tft.setTextColor(ILI9341_WHITE, ILI9341_BLACK);
-  tft.setTextSize(2);
-  tft.println("RECENT SLOW RUN:");
-  tft.println("Not yet run");
-  tft.println("");
-  tft.println("SLOW RUN AVG:");
-  tft.println("Not yet run");
-  tft.println("");
-  tft.println("RECENT FAST RUN:");
-  tft.println("Not yet run");
-  tft.println("");
-  tft.println("FAST RUN AVG:");
-  tft.println("Not yet run");
 
-  // top rectangle button visual
-  tft.drawRect(272,0,48,120, ILI9341_RED);
-  // slow written vertically
-  tft.setCursor(293,25);
+  highlightedString = 0;
   tft.setTextSize(2);
-  tft.print("S");
-  tft.setCursor(293,42);
-  tft.setTextSize(2);
-  tft.print("L");
-  tft.setCursor(293,59);
-  tft.setTextSize(2);
-  tft.print("O");
-  tft.setCursor(293,76);
-  tft.setTextSize(2);
-  tft.print("W");
-  // botom rectangle button visual
-  tft.drawRect(272,121,48,119, ILI9341_RED);
-  // fast written vertically
-  tft.setCursor(293,146);
-  tft.setTextSize(2);
-  tft.print("F");
-  tft.setCursor(293,163);
-  tft.setTextSize(2);
-  tft.print("A");
-  tft.setCursor(293,180);
-  tft.setTextSize(2);
-  tft.print("S");
-  tft.setCursor(293,197);
-  tft.setTextSize(2);
-  tft.print("T");
-
-  // SD card initialization for raw reads
-  Serial.print("Initializing SPI communication for raw reads...");
-  if (!card.init(SPI_HALF_SPEED, SD_CS)) {
-    Serial.println("failed! Is the card inserted properly?");
-    while (true) {}
-  }
-  else {
-    Serial.println("OK!");
-  }
+  tft.setTextWrap(false);// roll of the edge and not wrap around
+  // if you put true it displays the last line over
 }
 
 // the implementation from class
@@ -180,120 +160,68 @@ void getRestaurantFast(int restIndex, restaurant* restPtr) {
 
 int main() {
   setup();
-  int slowCounter = 0;
-  int totalSlow = 0;
-  int avgSlow = 0;
-  int fastCounter = 0;
-  int totalFast = 0;
-  int avgFast = 0;
-  unsigned long deltaSlow;
-  unsigned long deltaFast;
+
   // now start reading restaurant data, let's do the first block now
   restaurant restBlock[8]; // 512 bytes in total: a block
-
   restaurant rest;
 
-  while (true) {
 
-    //read touch screen data when pressed
-    TSPoint touch = ts.getPoint();
-  	int16_t screen_x = map(touch.y, TS_MINY, TS_MAXY, TFT_WIDTH-1, 0);
-  	int16_t screen_y = map(touch.x, TS_MINX, TS_MAXX, 0, TFT_HEIGHT-1);
-  	delay(200);
-    // if condition for the coordinates of the slow button
-    if (((screen_x >= 260) and (screen_x <= 320)) and ((screen_y >= 0) and (screen_y <= 120))){
-      Serial.println("Slow button pressed");
-      while(true){
-        Serial.print("Time: ");
-        // starting time when slow getrestaurant is run
-        unsigned long startTimeSlow = millis();
-        for (int i = 0; i < NUM_RESTAURANTS; ++i) {
-          getRestaurant(i, &rest);
-        }
-        // end time when slow get restaurant finished running
-        unsigned long endTimeSlow = millis();
-        // calculating the amount of time it takes for all restaurants to run
-        unsigned long deltaSlow = endTimeSlow - startTimeSlow;
-        Serial.print("relapse: ");
-        Serial.println(deltaSlow);
-        Serial.print("end time: ");
-        Serial.println(endTimeSlow);
-        Serial.print("start: ");
-        Serial.println(startTimeSlow);
-        // accumulate total speed every time slow is pressed
-        totalSlow = totalSlow + deltaSlow;
-        // how many times the slow button has been pressed
-        slowCounter ++;
-        // calculate average slow run
-        avgSlow = totalSlow / slowCounter;
-        delay(1000);
-        // redraw only the texts and slow times keeping the fast times the same
-        tft.setCursor(0,0);
-        tft.setTextColor(ILI9341_WHITE, ILI9341_BLACK);
-        tft.setTextSize(2);
-        tft.println("RECENT SLOW RUN:");
-        tft.print(deltaSlow);
-        tft.println(" ms       ");
-        tft.println("");
-        tft.println("SLOW RUN AVG:");
-        tft.print(avgSlow);
-        tft.println(" ms       ");
-        tft.println("");
-        tft.println("RECENT FAST RUN:");
-        tft.println("");
-        tft.println("");
-        tft.println("FAST RUN AVG:");
-        tft.println("");
-        break;
-      }
-    // if condition for the coordinates of the fast button
-    }else if(((screen_x >= 260) and (screen_x <= 320)) and ((screen_y >= 121) and (screen_y <= 240))) {
-      Serial.println("Fast button pressed");
-      while(true){
-        Serial.print("Time: ");
-        // starting time when getRestaurantFast is run
-        unsigned long startTimeFast = millis();
-        for (int i = 0; i < NUM_RESTAURANTS; ++i) {
-          getRestaurantFast(i, &rest);
-        }
-        // end time when fast get restaurant finished running
-        unsigned long endTimeFast = millis();
-        // calculating the amount of time it takes for all restaurants to run
-        unsigned long deltaFast = endTimeFast-startTimeFast;
-        Serial.print("relapse: ");
-        Serial.println(deltaFast);
-        Serial.print("end time: ");
-        Serial.println(endTimeFast);
-        Serial.print("start: ");
-        Serial.println(startTimeFast);
-        // accumulate total speed every time fast is pressed
-        totalFast = totalFast + deltaFast;
-        // how many times the fast button has been pressed
-        fastCounter ++;
-        // calculate average fast run
-        avgFast = totalFast / fastCounter;
-        delay(1000);
-        // redraw only the texts and fast times keeping the slow times the same
-        tft.setCursor(0,0);
-        tft.setTextColor(ILI9341_WHITE, ILI9341_BLACK);
-        tft.setTextSize(2);
-        tft.println("RECENT SLOW RUN:");
-        tft.println("");
-        tft.println("");
-        tft.println("SLOW RUN AVG:");
-        tft.println("");
-        tft.println("");
-        tft.println("RECENT FAST RUN:");
-        tft.print(deltaFast);
-        tft.println(" ms       ");
-        tft.println("");
-        tft.println("FAST RUN AVG:");
-        tft.print(avgFast);
-        tft.println(" ms       ");
-        break;
-      }
+  displayAllNames();
+  while (true) {
+    // if statement for if its on the 16- blank names go to a different function that draws the next few names
+
+    // reread the joystick everytime to check if a valid tilt is inputed
+    // int xVal = analogRead(JOY_HORIZ);
+    int yVal = analogRead(JOY_VERT);
+    int buttonVal = digitalRead(JOY_SEL);
+    uint16_t prevHighlight = highlightedString;
+    if (yVal >= (JOY_CENTER + JOY_DEADZONE)){ // this is to move down
+
+      highlightedString = (highlightedString+1)%NUM_NAMES; //highlighted one will be lower one since you pushed down
+      drawName(prevHighlight);
+      drawName(highlightedString);
+
+    } else if (yVal <= (JOY_CENTER - JOY_DEADZONE) ){ // this is move up
+      highlightedString = (highlightedString-1)%NUM_NAMES;
+      drawName(prevHighlight);
+      drawName(highlightedString);
     }
-	}
+    Serial.print("this is the current name");
+    Serial.println(highlightedString);
+    delay (50);
+
+
+    // Change the highlighted names with joysticks (done) (even works where if you go pass the top you go to bot and vice versa)
+    // add more names than can be dipslayed on one screen, and
+    // go to the " next page" of names if you select far enough down
+  }
+
+
+
+
+
+  // snippit from eclass
+/*
+  tft.fillScreen (0) ;
+  tft.setCursor (0 , 0) ; // where the characters will be displayed
+  tft.setTextWrap (false) ;
+  int selectedRest = 0; // which restaurant is selected ?
+  for ( int16_t i = 0; i < 30; i ++) {
+      Restaurant r ;
+      getRestaurant(restDist[i].index , &r) ;
+      if(i!= selectedRest) { // not highlighted
+        // white characters on black background
+        tft . setTextColor (0xFFFF , 0x0000) ;
+      } else { // highlighted
+        // black characters on white background
+        tft . setTextColor (0x0000 , 0xFFFF ) ;
+      }
+      tft.print ( r.name ) ;
+      tft.print ("\n") ;
+    }
+  tft.print ("\n") ;
+
+  */
   Serial.end();
   return 0;
 }
