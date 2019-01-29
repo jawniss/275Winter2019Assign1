@@ -51,6 +51,7 @@ Adafruit_ILI9341 tft = Adafruit_ILI9341(TFT_CS, TFT_DC);
 #define JOY_CENTER   512
 #define JOY_DEADZONE 64
 
+
 // name testing
 #define NUM_NAMES 18
 
@@ -100,24 +101,18 @@ struct restaurant {
   int32_t lon;
   uint8_t rating; // from 0 to 10
   char name[55];
-};
-
-// touch screen initialization to have coordinates match with our convention
-TSPoint touch = ts.getPoint();
-int16_t screen_x = map(touch.y, TS_MINY, TS_MAXY, TFT_WIDTH-1, 0);
-int16_t screen_y = map(touch.x, TS_MINX, TS_MAXX, 0, TFT_HEIGHT-1);
+}; restaurant
 
 // setup function
 void setup() {
   init();
   Serial.begin(9600);
 
-  // tft display initialization
-  tft.begin();
+	pinMode(JOY_SEL, INPUT_PULLUP);
 
-  pinMode(JOY_SEL, INPUT_PULLUP);
-  tft.fillScreen(ILI9341_BLACK);
-  tft.setRotation(3);
+	tft.begin();
+	tft.fillScreen(ILI9341_BLACK);
+	tft.setRotation(3);
 
   highlightedString = 0;
   tft.setTextSize(2);
@@ -165,6 +160,7 @@ int main() {
   restaurant restBlock[8]; // 512 bytes in total: a block
   restaurant rest;
 
+// name display test
 
   displayAllNames();
   while (true) {
@@ -207,7 +203,7 @@ int main() {
   tft.setTextWrap (false) ;
   int selectedRest = 0; // which restaurant is selected ?
   for ( int16_t i = 0; i < 30; i ++) {
-      Restaurant r ;
+      restaurant r ;
       getRestaurant(restDist[i].index , &r) ;
       if(i!= selectedRest) { // not highlighted
         // white characters on black background
@@ -220,8 +216,8 @@ int main() {
       tft.print ("\n") ;
     }
   tft.print ("\n") ;
+*/
 
-  */
   Serial.end();
   return 0;
 }
