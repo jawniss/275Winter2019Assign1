@@ -26,7 +26,7 @@ Adafruit_ILI9341 tft = Adafruit_ILI9341(TFT_CS, TFT_DC);
 Sd2Card card;
 
 // global variables for counter to know if a new block is needed
-int restCounter = 8;
+uint32_t lastBlockNum = REST_START_BLOCK-1;
 // global variable for restaurant block as a casche
 uint8_t* restBlock;
 
@@ -36,6 +36,40 @@ struct restaurant {
   uint8_t rating; // from 0 to 10
   char name[55];
 };
+
+
+/*
+struct RestDist {
+  uint16_t index; //index of restaurant from 0 to NUM_RESTAURANTS - 1
+  uint 16_t dist; // manhatten distance to cursor position
+};
+RestDist rest_dist[NUM_RESTAURANTS];
+
+
+
+// swap function from eclass quicksort.cpp that swaps two inputs
+void swap(int* a,int* b){
+	int t = *a;
+	*a = *b;
+	*b = t;
+}
+
+// working i sort
+void isort(RestDist* dist,int len){
+  int i;
+  int j;
+  i = 1;
+  while (i < lenArray){
+    j = i;
+    while (( j>0 ) && (array[j-1] > array[j])){
+      swap(array[j],array[j-1]);
+      j = j-1;
+    }
+    i = i+1;
+  }
+}
+*/
+
 int latitude[1067];
 int longitude[1067];
 
@@ -101,21 +135,23 @@ void getRestaurant(int restIndex, restaurant* restPtr) {
 
 // fast version self made which resuses block if already loaded
 void getRestaurantFast(int restIndex, restaurant* restPtr) {
+
   // obtain block number
   uint32_t blockNum = REST_START_BLOCK + restIndex/8;
-  restaurant restBlock[8];
+  restaurant restBlock[8];// cache
   // if condition to see if we need a new block
   // if not needed we use the casched block saved in global variable above
-  if (restCounter == 8){
+  if (lastBlockNum != blockNum){
+    lastBlockNum = blockNum;
     // reset counter
-    restCounter = 0;
+    //restCounter = 0;
     // overwrite the block
     while (!card.readBlock(blockNum, (uint8_t*) restBlock)) {
       Serial.println("Read block failed, trying again.");
     }
   }
   // increment counter everytime a restaurant is read
-  restCounter ++;
+  //restCounter ++;
 
   *restPtr = restBlock[restIndex % 8];
 }
@@ -135,7 +171,7 @@ int main() {
   restaurant rest;
 
 
-  for (int i; i < 1066;i++){
+  for (int i; i < 1067;i++){
     getRestaurantFast(i, &rest);
     Serial.print(i);
     Serial.print(" ");
@@ -150,6 +186,7 @@ int main() {
     Serial.print(" this is lon  ");
     Serial.println(rest.lon);
   }
+
 
 
 
