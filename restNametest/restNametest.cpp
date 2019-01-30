@@ -61,29 +61,8 @@ void setup() {
   init();
   Serial.begin(9600);
 
-  // including this seems to fix some SD card readblock errors
-  // (at least on the old display)
   tft.begin();
   tft.fillScreen(ILI9341_BLACK);
-  // The following initialization (commented out) is
-  // not needed for just raw reads from the SD card, but you should add it later
-  // when you bring the map picture back into your assignment
-  // (both initializations are required for the assignment)
-
-  // initialize the SD card
-  /*
-  Serial.print("Initializing SD card...");
-  if (!SD.begin(SD_CS)) {
-    Serial.println("failed! Is the card inserted properly?");
-    while (true) {}
-  }
-  else {
-    Serial.println("OK!");
-  }
-  */
-
-  // initialize SPI (serial peripheral interface)
-  // communication between the Arduino and the SD controller
 
   Serial.print("Initializing SPI communication for raw reads...");
   // SPI Speed can be SPI_FULL_SPEED, SPI_HALF_SPEED or SPI_QUARTER_SPEED.
@@ -94,25 +73,6 @@ void setup() {
   else {
     Serial.println("OK!");
   }
-}
-
-// read the restaurant at position "restIndex" from the card
-// and store at the location pointed to by restPtr
-void getRestaurant(int restIndex, restaurant* restPtr) {
-  // calculate the block containing this restaurant
-  uint32_t blockNum = REST_START_BLOCK + restIndex/8;
-  restaurant restBlock[8];
-
-   //Serial.println(blockNum);
-
-  // fetch the block of restaurants containing the restaurant
-  // with index "restIndex"
-  while (!card.readBlock(blockNum, (uint8_t*) restBlock)) {
-    Serial.println("Read block failed, trying again.");
-  }
-   //Serial.print("Loaded: ");
-   //Serial.println(restBlock[0].name);
-  *restPtr = restBlock[restIndex % 8];
 }
 
 // fast version self made which resuses block if already loaded
@@ -137,6 +97,15 @@ void getRestaurantFast(int restIndex, restaurant* restPtr) {
   //restCounter ++;
 
   *restPtr = restBlock[restIndex % 8];
+}
+
+// void manhatten(current location x, all restaurantx, current location y, all restauranty){
+void manhatten(int restx[], int resty[]){
+  int currentx = 0;
+  int currenty = 0;
+  for (int i=0; i < 30;i++){
+    rest_dist[i].dist = abs(currentx - restx[i]) + abs(currenty - resty[i]);
+  }
 }
 
 /*
@@ -191,8 +160,10 @@ int main() {
   Serial.println("Fetching all restaurants");
   restaurant rest;
 
-  for (int i=0; i < 1065;i++){
-    getRestaurantFast(i, &rest);
+  for (int i=0; i < 30;i++){
+    getRestaurantFast(i, &rest); // first value tells you what restaurant that number is and allows you to look for it directly
+      // what you do is find the manhatten dist of closest one and
+      /*
       Serial.print(i);
       Serial.print(" ");
       Serial.println(rest.name);
@@ -203,43 +174,19 @@ int main() {
       Serial.print(i);
       Serial.print(" this is lon in x  ");
       Serial.println(lon_to_x(rest.lon));
-
+      */
+      longitude[i] = lon_to_x(rest.lon) ;
+      latitude[i] = lat_to_y(rest.lat);
+      rest_dist[i].index = i;
   }
 
-
-
-  // Part 1
-  /*
-  for (int i = 0; i < NUM_RESTAURANTS; ++i) {
-    getRestaurantFast(i, &rest);
-    if (rest.rating == 10){
-      Serial.print(i);
-      Serial.print(" ");
-      Serial.println(rest.name);
-    }
+  manhatten(longitude, latitude);
+  for (int i=0; i < 30;i++){
+    Serial.print(" this is index");
+    Serial.print(rest_dist[i].index);
+    Serial.print("     this is ");
+    Serial.println(rest_dist[i].dist);
   }
-  */
-
-  /*
-  // Part 2
-  for (int i = 0; i < NUM_RESTAURANTS; ++i) {
-    getRestaurantFast(i, &rest);
-    if (strstr(rest.name, "Subway")){
-        Serial.print(i);
-        Serial.print(" ");
-        Serial.print("Latitude: ");
-        Serial.print(rest.lat);
-        Serial.print(", Longitude: ");
-        Serial.print(rest.lon);
-        Serial.print(", Rating: ");
-        Serial.print(rest.rating);
-        Serial.println();
-        Serial.print("this is restaurant name:  ");
-        Serial.println(rest.name);
-      }
-  }
-*/
-
 
   Serial.end();
 
