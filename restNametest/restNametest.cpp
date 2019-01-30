@@ -25,6 +25,11 @@ Adafruit_ILI9341 tft = Adafruit_ILI9341(TFT_CS, TFT_DC);
 // different than SD
 Sd2Card card;
 
+// global variables for counter to know if a new block is needed
+int restCounter = 8;
+// global variable for restaurant block as a casche
+uint8_t* restBlock;
+
 struct restaurant {
   int32_t lat;
   int32_t lon;
@@ -94,6 +99,28 @@ void getRestaurant(int restIndex, restaurant* restPtr) {
   *restPtr = restBlock[restIndex % 8];
 }
 
+// fast version self made which resuses block if already loaded
+void getRestaurantFast(int restIndex, restaurant* restPtr) {
+  // obtain block number
+  uint32_t blockNum = REST_START_BLOCK + restIndex/8;
+  restaurant restBlock[8];
+  // if condition to see if we need a new block
+  // if not needed we use the casched block saved in global variable above
+  if (restCounter == 8){
+    // reset counter
+    restCounter = 0;
+    // overwrite the block
+    while (!card.readBlock(blockNum, (uint8_t*) restBlock)) {
+      Serial.println("Read block failed, trying again.");
+    }
+  }
+  // increment counter everytime a restaurant is read
+  restCounter ++;
+
+  *restPtr = restBlock[restIndex % 8];
+}
+
+
 int main() {
   setup();
 
@@ -109,7 +136,7 @@ int main() {
 
 
   for (int i; i < 1066;i++){
-    getRestaurant(i, &rest);
+    getRestaurantFast(i, &rest);
     Serial.print(i);
     Serial.print(" ");
     Serial.println(rest.name);
@@ -126,19 +153,23 @@ int main() {
 
 
 
-  /*
+
   // Part 1
+  /*
   for (int i = 0; i < NUM_RESTAURANTS; ++i) {
-    getRestaurant(i, &rest);
+    getRestaurantFast(i, &rest);
     if (rest.rating == 10){
       Serial.print(i);
       Serial.print(" ");
       Serial.println(rest.name);
     }
   }
+  */
+
+  /*
   // Part 2
   for (int i = 0; i < NUM_RESTAURANTS; ++i) {
-    getRestaurant(i, &rest);
+    getRestaurantFast(i, &rest);
     if (strstr(rest.name, "Subway")){
         Serial.print(i);
         Serial.print(" ");
@@ -153,7 +184,7 @@ int main() {
         Serial.println(rest.name);
       }
   }
-  */
+*/
 
 
   Serial.end();
