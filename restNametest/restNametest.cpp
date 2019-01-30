@@ -19,6 +19,13 @@
 
 #define REST_START_BLOCK 4000000
 #define NUM_RESTAURANTS 1066
+// These constants are for the 2048 by 2048 map .
+# define MAP_WIDTH 2048
+# define MAP_HEIGHT 2048
+# define LAT_NORTH 5361858l
+# define LAT_SOUTH 5340953l
+# define LON_WEST -11368652l
+# define LON_EAST -11333496l
 
 Adafruit_ILI9341 tft = Adafruit_ILI9341(TFT_CS, TFT_DC);
 
@@ -39,37 +46,13 @@ struct restaurant {
 uint32_t lastBlockNum = REST_START_BLOCK-1;
 restaurant restBlock[8];
 
-/*
+
 struct RestDist {
   uint16_t index; //index of restaurant from 0 to NUM_RESTAURANTS - 1
-  uint 16_t dist; // manhatten distance to cursor position
+  uint16_t dist; // manhatten distance to cursor position
 };
 RestDist rest_dist[NUM_RESTAURANTS];
 
-
-
-// swap function from eclass quicksort.cpp that swaps two inputs
-void swap(int* a,int* b){
-	int t = *a;
-	*a = *b;
-	*b = t;
-}
-
-// working i sort
-void isort(RestDist* dist,int len){
-  int i;
-  int j;
-  i = 1;
-  while (i < lenArray){
-    j = i;
-    while (( j>0 ) && (array[j-1] > array[j])){
-      swap(array[j],array[j-1]);
-      j = j-1;
-    }
-    i = i+1;
-  }
-}
-*/
 
 int latitude[1067];
 int longitude[1067];
@@ -156,6 +139,45 @@ void getRestaurantFast(int restIndex, restaurant* restPtr) {
   *restPtr = restBlock[restIndex % 8];
 }
 
+/*
+// swap function from eclass quicksort.cpp that swaps two inputs
+void swap(int* a,int* b){
+	int t = *a;
+	*a = *b;
+	*b = t;
+}
+
+// working i sort
+void isort(RestDist* dist,int len){
+  int i;
+  int j;
+  i = 1;
+  while (i < lenArray){
+    j = i;
+    while (( j>0 ) && (array[j-1] > array[j])){
+      swap(array[j],array[j-1]);
+      j = j-1;
+    }
+    i = i+1;
+  }
+}
+*/
+
+
+// These functions convert between x/y map position and lat /lon
+// (and vice versa .)
+int32_t x_to_lon(int16_t x) {
+  return map(x , 0, MAP_WIDTH, LON_WEST, LON_EAST) ;
+}
+int32_t y_to_lat(int16_t y) {
+  return map(y , 0, MAP_HEIGHT, LAT_NORTH, LAT_SOUTH) ;
+}
+int16_t lon_to_x (int32_t lon) {
+  return map( lon, LON_WEST, LON_EAST, 0, MAP_WIDTH) ;
+}
+int16_t lat_to_y (int32_t lat) {
+  return map( lat, LAT_NORTH, LAT_SOUTH, 0, MAP_HEIGHT) ;
+}
 
 int main() {
   setup();
@@ -165,29 +187,24 @@ int main() {
 
   Serial.println("Now reading restaurants");
 
-
   Serial.println();
   Serial.println("Fetching all restaurants");
   restaurant rest;
 
-
   for (int i=0; i < 1065;i++){
     getRestaurantFast(i, &rest);
-    Serial.print(i);
-    Serial.print(" ");
-    Serial.println(rest.name);
+      Serial.print(i);
+      Serial.print(" ");
+      Serial.println(rest.name);
+      Serial.print(i);
+      Serial.print(" this is lat in y ");
+      Serial.println(lat_to_y (rest.lat));
+      longitude[i] = rest.lon;
+      Serial.print(i);
+      Serial.print(" this is lon in x  ");
+      Serial.println(lon_to_x(rest.lon));
 
-    latitude[i] = rest.lat;
-    Serial.print(i);
-    Serial.print(" this is lat  ");
-    Serial.println(rest.lat);
-    longitude[i] = rest.lon;
-    Serial.print(i);
-    Serial.print(" this is lon  ");
-    Serial.println(rest.lon);
   }
-
-
 
 
 
