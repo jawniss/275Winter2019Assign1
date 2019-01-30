@@ -11,8 +11,5 @@ this is just for a list of what needs to be done still
      with it's manhatten distance --> manhatten distance only has to be updated when you select that restaurant 
      --> to decide which 30 are the closest rests, do when you click the joystic,, run the calculations to find the 
          closest restaurants
-
-
-
-
-alksejf
+   - want a pointer to the array that holds all restdists, the pointer points to the object in the 
+     restdist array, when you move an object in the restdist array it moves the restauarant index and distance together
