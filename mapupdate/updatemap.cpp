@@ -53,6 +53,10 @@ int left, right;
 #define YEG_MIDDLE_X (LCD_WIDTH/2 - MAP_DISP_WIDTH/2)
 #define YEG_MIDDLE_Y (LCD_HEIGHT/2 - MAP_DISP_HEIGHT/2)
 
+
+int mapx = 888;
+int mapy = 904;
+
 // forward declaration for drawing the cursor
 void redrawCursor(int newX, int newY, int oldX, int oldY);
 
@@ -96,7 +100,7 @@ void redrawCursor(int newX, int newY, int oldX, int oldY) {
 
   // draw the patch of edmonton over the old cursor
   lcd_image_draw(&yegImage, &tft,
-                 YEG_MIDDLE_X + oldX + 50*right - 50*left, YEG_MIDDLE_Y + oldY,
+                 mapx + oldX, mapy + oldY,
                  oldX, oldY, CURSOR_SIZE, CURSOR_SIZE);
 
   // and now draw the cursor at the new position
@@ -110,21 +114,36 @@ void redrawCursor(int newX, int newY, int oldX, int oldY) {
 
 
 void screenupdate() {
-  int left, right;
   if (cursorX == 0) {
-    right--;
-    left++;
-    lcd_image_draw(&yegImage, &tft, YEG_MIDDLE_X - (left * 50),
-    YEG_MIDDLE_Y, 0, 0, MAP_DISP_WIDTH, MAP_DISP_HEIGHT);
+    mapx-=50;
+    lcd_image_draw(&yegImage, &tft, mapx,
+    mapy, 0, 0, MAP_DISP_WIDTH, MAP_DISP_HEIGHT);
+
     cursorX = 250;
   }
   if (cursorX == 263) {
-    left--;
-    right++;
-    lcd_image_draw(&yegImage, &tft, YEG_MIDDLE_X + (right * 50),
-    YEG_MIDDLE_Y, 0, 0, MAP_DISP_WIDTH, MAP_DISP_HEIGHT);
+    mapx+=50;
+    lcd_image_draw(&yegImage, &tft, mapx,
+    mapy, 0, 0, MAP_DISP_WIDTH, MAP_DISP_HEIGHT);
+
     cursorX = 10;
   }
+  if (cursorY == 0) {
+    mapy-=50;
+    lcd_image_draw(&yegImage, &tft, mapx,
+    mapy, 0, 0, MAP_DISP_WIDTH, MAP_DISP_HEIGHT);
+
+    cursorY = 220;
+  }
+  if (cursorY == 231) {
+    mapy+=50;
+    lcd_image_draw(&yegImage, &tft, mapx,
+    mapy, 0, 0, MAP_DISP_WIDTH, MAP_DISP_HEIGHT);
+
+    cursorY = 10;
+  }
+  // FIND THE CUNTION WHERE IT REDRAWS THE LITTLE PART OF THE MAP AND DO
+  // RIGHT*50 THERE
 
 }
 
@@ -175,7 +194,8 @@ void processJoystick() {
 
 int main() {
 	setup();
-
+  Serial.println(mapx);
+  Serial.println(mapy);
   while (true) {
     processJoystick();
   }
