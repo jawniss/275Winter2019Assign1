@@ -7,3 +7,7 @@ this is just for a list of what needs to be done still
 3. figure out getrestaurant fast
 4. something about when you click the screen, show locations of the restaurants that are on the screen
 5. getting the 30 closest restauarants 
+   - use the restdist struct, using the restaurants list and the index like 0 to 1066 etc store the index of that restaurant
+     with it's manhatten distance --> manhatten distance only has to be updated when you select that restaurant 
+     --> to decide which 30 are the closest rests, do when you click the joystic,, run the calculations to find the 
+         closest restaurants
