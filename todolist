@@ -3,5 +3,7 @@ this is just for a list of what needs to be done still
 1. when you click the joystick, go to the selection of the restauarants
 2. in the restaurant highlighting list part, change so that when you reach bottom (or maybe top too) of list, 
    to go to the 'next page' of the list --> currently loops back to the top
+   2.1 when you select a restaurant, teleport to that restaurant's location
 3. figure out getrestaurant fast
 4. something about when you click the screen, show locations of the restaurants that are on the screen
+5. getting the 30 closest restauarants 
