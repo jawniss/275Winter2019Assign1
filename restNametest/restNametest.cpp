@@ -81,15 +81,15 @@ void getRestaurant(int restIndex, restaurant* restPtr) {
   uint32_t blockNum = REST_START_BLOCK + restIndex/8;
   restaurant restBlock[8];
 
-   Serial.println(blockNum);
+   //Serial.println(blockNum);
 
   // fetch the block of restaurants containing the restaurant
   // with index "restIndex"
   while (!card.readBlock(blockNum, (uint8_t*) restBlock)) {
     Serial.println("Read block failed, trying again.");
   }
-   Serial.print("Loaded: ");
-   Serial.println(restBlock[0].name);
+   //Serial.print("Loaded: ");
+   //Serial.println(restBlock[0].name);
 
   *restPtr = restBlock[restIndex % 8];
 }
@@ -110,6 +110,10 @@ int main() {
 
   for (int i; i < 1066;i++){
     getRestaurant(i, &rest);
+    Serial.print(i);
+    Serial.print(" ");
+    Serial.println(rest.name);
+
     latitude[i] = rest.lat;
     Serial.print(i);
     Serial.print(" this is lat  ");
