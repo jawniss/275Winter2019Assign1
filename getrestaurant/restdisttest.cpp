@@ -2,10 +2,10 @@
 
 
 /*
-  A demonstration of how we can fetch restaurant data from the SD card
-  by reading one block at a time.
+A demonstration of how we can fetch restaurant data from the SD card
+by reading one block at a time.
 
-  Also has some examples of how to use structs.
+Also has some examples of how to use structs.
 */
 
 #include <Arduino.h>
@@ -41,8 +41,8 @@ restaurant restBlock[8];
 
 /*
 struct RestDist {
-  uint16_t index; //index of restaurant from 0 to NUM_RESTAURANTS - 1
-  uint 16_t dist; // manhatten distance to cursor position
+uint16_t index; //index of restaurant from 0 to NUM_RESTAURANTS - 1
+uint 16_t dist; // manhatten distance to cursor position
 };
 RestDist rest_dist[NUM_RESTAURANTS];
 
@@ -50,24 +50,24 @@ RestDist rest_dist[NUM_RESTAURANTS];
 
 // swap function from eclass quicksort.cpp that swaps two inputs
 void swap(int* a,int* b){
-	int t = *a;
-	*a = *b;
-	*b = t;
+int t = *a;
+*a = *b;
+*b = t;
 }
 
 // working i sort
 void isort(RestDist* dist,int len){
-  int i;
-  int j;
-  i = 1;
-  while (i < lenArray){
-    j = i;
-    while (( j>0 ) && (array[j-1] > array[j])){
-      swap(array[j],array[j-1]);
-      j = j-1;
-    }
-    i = i+1;
-  }
+int i;
+int j;
+i = 1;
+while (i < lenArray){
+j = i;
+while (( j>0 ) && (array[j-1] > array[j])){
+swap(array[j],array[j-1]);
+j = j-1;
+}
+i = i+1;
+}
 }
 */
 
@@ -91,26 +91,26 @@ void setup() {
   /*
   Serial.print("Initializing SD card...");
   if (!SD.begin(SD_CS)) {
-    Serial.println("failed! Is the card inserted properly?");
-    while (true) {}
-  }
-  else {
-    Serial.println("OK!");
-  }
-  */
+  Serial.println("failed! Is the card inserted properly?");
+  while (true) {}
+}
+else {
+Serial.println("OK!");
+}
+*/
 
-  // initialize SPI (serial peripheral interface)
-  // communication between the Arduino and the SD controller
+// initialize SPI (serial peripheral interface)
+// communication between the Arduino and the SD controller
 
-  Serial.print("Initializing SPI communication for raw reads...");
-  // SPI Speed can be SPI_FULL_SPEED, SPI_HALF_SPEED or SPI_QUARTER_SPEED.
-  if (!card.init(SPI_HALF_SPEED, SD_CS)) {
-    Serial.println("failed! Is the card inserted properly?");
-    while (true) {}
-  }
-  else {
-    Serial.println("OK!");
-  }
+Serial.print("Initializing SPI communication for raw reads...");
+// SPI Speed can be SPI_FULL_SPEED, SPI_HALF_SPEED or SPI_QUARTER_SPEED.
+if (!card.init(SPI_HALF_SPEED, SD_CS)) {
+  Serial.println("failed! Is the card inserted properly?");
+  while (true) {}
+}
+else {
+  Serial.println("OK!");
+}
 }
 
 // read the restaurant at position "restIndex" from the card
@@ -120,15 +120,15 @@ void getRestaurant(int restIndex, restaurant* restPtr) {
   uint32_t blockNum = REST_START_BLOCK + restIndex/8;
   restaurant restBlock[8];
 
-   //Serial.println(blockNum);
+  //Serial.println(blockNum);
 
   // fetch the block of restaurants containing the restaurant
   // with index "restIndex"
   while (!card.readBlock(blockNum, (uint8_t*) restBlock)) {
     Serial.println("Read block failed, trying again.");
   }
-   //Serial.print("Loaded: ");
-   //Serial.println(restBlock[0].name);
+  //Serial.print("Loaded: ");
+  //Serial.println(restBlock[0].name);
   *restPtr = restBlock[restIndex % 8];
 }
 
@@ -157,6 +157,52 @@ void getRestaurantFast(int restIndex, restaurant* restPtr) {
 }
 
 
+struct RestDist {
+  uint16_t index; // index of restaurant from 0 to NUM_RESTAURANTS-1
+  uint16_t dist; // Manhatten distance to cursor position
+};
+
+//RestDist rest_dist[NUM_RESTAURANTS];
+
+
+
+
+
+void manhattendist (int restx, int resty, int cursorx, int cursory) {
+  for (int r = 0; r < 10; r++) {
+
+  }
+  int restdistx = (restx - cursorx);
+  int restdisty = (resty - cursory);
+  if (restdistx < 0) {
+    restdistx = restdistx * (-1);
+  }
+  if (restdisty < 0) {
+    restdisty = restdisty * (-1);
+  }
+  int totaldist = restdistx + restdisty;
+  return totaldist;
+}
+
+
+
+void storingintorestdist () {
+  for (int u = 0; u < 10; u++) {
+    getRestaurantFast(u, &rest);
+    rest_dist[u].index = u;
+    rest_dist[u].dist = rest.lon;
+  }
+  for (int a = 0; a < 10; a++) {
+    Serial.print(a);
+    Serial.print(": ");
+    Serial.println(rest_dist[a].dist);
+  }
+}
+
+
+
+
+
 int main() {
   setup();
 
@@ -171,7 +217,7 @@ int main() {
   restaurant rest;
 
 
-  for (int i=0; i < 1065;i++){
+  for (int i=0; i < 10;i++){
     getRestaurantFast(i, &rest);
     Serial.print(i);
     Serial.print(" ");
@@ -186,7 +232,8 @@ int main() {
     Serial.print(" this is lon  ");
     Serial.println(rest.lon);
   }
-
+  delay(5000);
+storingintorestdist();
 
 
 
@@ -194,37 +241,37 @@ int main() {
   // Part 1
   /*
   for (int i = 0; i < NUM_RESTAURANTS; ++i) {
-    getRestaurantFast(i, &rest);
-    if (rest.rating == 10){
-      Serial.print(i);
-      Serial.print(" ");
-      Serial.println(rest.name);
-    }
-  }
-  */
+  getRestaurantFast(i, &rest);
+  if (rest.rating == 10){
+  Serial.print(i);
+  Serial.print(" ");
+  Serial.println(rest.name);
+}
+}
+*/
 
-  /*
-  // Part 2
-  for (int i = 0; i < NUM_RESTAURANTS; ++i) {
-    getRestaurantFast(i, &rest);
-    if (strstr(rest.name, "Subway")){
-        Serial.print(i);
-        Serial.print(" ");
-        Serial.print("Latitude: ");
-        Serial.print(rest.lat);
-        Serial.print(", Longitude: ");
-        Serial.print(rest.lon);
-        Serial.print(", Rating: ");
-        Serial.print(rest.rating);
-        Serial.println();
-        Serial.print("this is restaurant name:  ");
-        Serial.println(rest.name);
-      }
-  }
+/*
+// Part 2
+for (int i = 0; i < NUM_RESTAURANTS; ++i) {
+getRestaurantFast(i, &rest);
+if (strstr(rest.name, "Subway")){
+Serial.print(i);
+Serial.print(" ");
+Serial.print("Latitude: ");
+Serial.print(rest.lat);
+Serial.print(", Longitude: ");
+Serial.print(rest.lon);
+Serial.print(", Rating: ");
+Serial.print(rest.rating);
+Serial.println();
+Serial.print("this is restaurant name:  ");
+Serial.println(rest.name);
+}
+}
 */
 
 
-  Serial.end();
+Serial.end();
 
-  return 0;
+return 0;
 }
