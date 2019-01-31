@@ -1,13 +1,3 @@
-
-
-
-/*
-  A demonstration of how we can fetch restaurant data from the SD card
-  by reading one block at a time.
-
-  Also has some examples of how to use structs.
-*/
-
 #include <Arduino.h>
 #include <Adafruit_GFX.h>
 #include <Adafruit_ILI9341.h>
@@ -46,16 +36,14 @@ struct restaurant {
 uint32_t lastBlockNum = REST_START_BLOCK-1;
 restaurant restBlock[8];
 
-
 struct RestDist {
   uint16_t index; //index of restaurant from 0 to NUM_RESTAURANTS - 1
   uint16_t dist; // manhatten distance to cursor position
 };
 RestDist rest_dist[NUM_RESTAURANTS];
 
-
-int latitude[1067];
-int longitude[1067];
+// int latitude[1067];
+// int longitude[1067];
 
 void setup() {
   init();
@@ -85,56 +73,28 @@ void getRestaurantFast(int restIndex, restaurant* restPtr) {
 
   if (lastBlockNum != blockNum){
     lastBlockNum = blockNum;
-    //restaurant restBlock[8];// cache
-    // reset counter
-    //restCounter = 0;
     // overwrite the block
     while (!card.readBlock(blockNum, (uint8_t*) restBlock)) {
       Serial.println("Read block failed, trying again.");
     }
   }
-  // increment counter everytime a restaurant is read
-  //restCounter ++;
 
   *restPtr = restBlock[restIndex % 8];
 }
 
 // void manhatten(current location x, all restaurantx, current location y, all restauranty){
-void manhatten(int restx[], int resty[]){
+int manhatten(int restx, int resty){
   int currentx = 0;
   int currenty = 0;
-  for (int i=0; i < 30;i++){
-    rest_dist[i].dist = abs(currentx - restx[i]) + abs(currenty - resty[i]);
-  }
+  int distance;
+  distance = abs(currentx - restx) + abs(currenty - resty);
+  return distance;
 }
-
-/*
-// swap function from eclass quicksort.cpp that swaps two inputs
-void swap(int* a,int* b){
-	int t = *a;
-	*a = *b;
-	*b = t;
-}
-
-// working i sort
-void isort(RestDist* dist,int len){
-  int i;
-  int j;
-  i = 1;
-  while (i < lenArray){
-    j = i;
-    while (( j>0 ) && (array[j-1] > array[j])){
-      swap(array[j],array[j-1]);
-      j = j-1;
-    }
-    i = i+1;
-  }
-}
-*/
 
 
 // These functions convert between x/y map position and lat /lon
 // (and vice versa .)
+
 int32_t x_to_lon(int16_t x) {
   return map(x , 0, MAP_WIDTH, LON_WEST, LON_EAST) ;
 }
@@ -148,45 +108,66 @@ int16_t lat_to_y (int32_t lat) {
   return map( lat, LAT_NORTH, LAT_SOUTH, 0, MAP_HEIGHT) ;
 }
 
+// swap function from eclass quicksort.cpp that swaps two inputs
+void swap(int* a,int* b){
+	int t = *a;
+	*a = *b;
+	*b = t;
+}
+
+// working i sort
+void isort(RestDist* dist,int len){
+  int i;
+  int j;
+  i = 1;
+  while (i < len){
+    j = i;
+    while (( j>0 ) && (dist[j-1] > dist[j])){
+      swap(dist[j],dist[j-1]);
+      j = j-1;
+    }
+    i = i+1;
+  }
+}
+
+
 int main() {
   setup();
 
-  // now start reading restaurant data, let's do the first block now
-  //restaurant restBlock[8]; // 512 bytes in total: a block
-
-  Serial.println("Now reading restaurants");
-
-  Serial.println();
-  Serial.println("Fetching all restaurants");
   restaurant rest;
+  int lt, ln;
 
+  //manhatten(longitude, latitude);
   for (int i=0; i < 30;i++){
     getRestaurantFast(i, &rest); // first value tells you what restaurant that number is and allows you to look for it directly
-      // what you do is find the manhatten dist of closest one and
-      /*
-      Serial.print(i);
-      Serial.print(" ");
-      Serial.println(rest.name);
-      Serial.print(i);
-      Serial.print(" this is lat in y ");
-      Serial.println(lat_to_y (rest.lat));
-      longitude[i] = rest.lon;
-      Serial.print(i);
-      Serial.print(" this is lon in x  ");
-      Serial.println(lon_to_x(rest.lon));
-      */
-      longitude[i] = lon_to_x(rest.lon) ;
-      latitude[i] = lat_to_y(rest.lat);
-      rest_dist[i].index = i;
-  }
+      // what you do is find the manhatten dist of closest one
 
-  manhatten(longitude, latitude);
+      ln = lon_to_x(rest.lon) ;
+      lt = lat_to_y(rest.lat);
+      rest_dist[i].dist = manhatten(ln,lt);
+      rest_dist[i].index = i;
+
+      Serial.print(" this is index: ");
+      Serial.print(rest_dist[i].index);
+      Serial.print("    this is longitude: ");
+      Serial.println(ln);
+      Serial.print("    this is longitude: ");
+      Serial.print(lt);
+      Serial.print("    this is rest_dist: ");
+      Serial.println(rest_dist[i].dist);
+
+  }
+  /*
+  isort(RestDist.dist,30);
   for (int i=0; i < 30;i++){
-    Serial.print(" this is index");
+    Serial.print(" this is index: ");
     Serial.print(rest_dist[i].index);
-    Serial.print("     this is ");
+    Serial.print("    this is rest_dist: ");
     Serial.println(rest_dist[i].dist);
   }
+  */
+
+
 
   Serial.end();
 

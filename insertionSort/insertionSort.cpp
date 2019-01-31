@@ -27,6 +27,31 @@ void isort(int array[],int lenArray){
   }
 }
 
+/*
+// swap function from eclass quicksort.cpp that swaps two inputs
+void swap(int* a,int* b){
+	int t = *a;
+	*a = *b;
+	*b = t;
+}
+
+// working i sort
+void isort(RestDist* dist,int len){
+  int i;
+  int j;
+  i = 1;
+  while (i < lenArray){
+    j = i;
+    while (( j>0 ) && (array[j-1] > array[j])){
+      swap(array[j],array[j-1]);
+      j = j-1;
+    }
+    i = i+1;
+  }
+}
+*/
+
+
 int main(){
   int n;
   int array[1067];
