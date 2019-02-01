@@ -108,21 +108,33 @@ int16_t lat_to_y (int32_t lat) {
   return map( lat, LAT_NORTH, LAT_SOUTH, 0, MAP_HEIGHT) ;
 }
 
+
+// swap function similar to eclass quicksort.cpp that swaps two inputs
+void swap(RestDist& dist,RestDist& dist2){
+	RestDist temp = dist;
+	dist = dist2;
+	dist2 = temp;
+}
+
+/*
 // swap function from eclass quicksort.cpp that swaps two inputs
 void swap(int* a,int* b){
 	int t = *a;
 	*a = *b;
 	*b = t;
 }
+*/
 
 // working i sort
-void isort(RestDist* dist,int len){
+void isort(RestDist dist[],int len){
   int i;
   int j;
   i = 1;
   while (i < len){
     j = i;
-    while (( j>0 ) && (dist[j-1] > dist[j])){
+    // need .dist to compare just the distances
+    while (( j>0 ) && (dist[j-1].dist > dist[j].dist)){
+      // but swap the whole struct to keep index lined up
       swap(dist[j],dist[j-1]);
       j = j-1;
     }
@@ -138,7 +150,7 @@ int main() {
   int lt, ln;
 
   //manhatten(longitude, latitude);
-  for (int i=0; i < 30;i++){
+  for (int i=0; i < 1067;i++){
     getRestaurantFast(i, &rest); // first value tells you what restaurant that number is and allows you to look for it directly
       // what you do is find the manhatten dist of closest one
 
@@ -146,7 +158,7 @@ int main() {
       lt = lat_to_y(rest.lat);
       rest_dist[i].dist = manhatten(ln,lt);
       rest_dist[i].index = i;
-
+      /*
       Serial.print(" this is index: ");
       Serial.print(rest_dist[i].index);
       Serial.print("    this is longitude: ");
@@ -155,17 +167,19 @@ int main() {
       Serial.print(lt);
       Serial.print("    this is rest_dist: ");
       Serial.println(rest_dist[i].dist);
+      */
 
   }
-  /*
-  isort(RestDist.dist,30);
-  for (int i=0; i < 30;i++){
+
+  isort(rest_dist,NUM_RESTAURANTS);
+  // maybe only need to show to 30
+  for (int i=0; i < 1067;i++){
     Serial.print(" this is index: ");
     Serial.print(rest_dist[i].index);
     Serial.print("    this is rest_dist: ");
     Serial.println(rest_dist[i].dist);
   }
-  */
+
 
 
 
