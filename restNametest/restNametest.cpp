@@ -82,9 +82,10 @@ void getRestaurantFast(int restIndex, restaurant* restPtr) {
   *restPtr = restBlock[restIndex % 8];
 }
 
+
 // void manhatten(current location x, all restaurantx, current location y, all restauranty){
 int manhatten(int restx, int resty){
-  int currentx = 0;
+  int currentx = 0; // comment out these two when you have postion from cursor
   int currenty = 0;
   int distance;
   distance = abs(currentx - restx) + abs(currenty - resty);
@@ -116,15 +117,6 @@ void swap(RestDist& dist,RestDist& dist2){
 	dist2 = temp;
 }
 
-/*
-// swap function from eclass quicksort.cpp that swaps two inputs
-void swap(int* a,int* b){
-	int t = *a;
-	*a = *b;
-	*b = t;
-}
-*/
-
 // working i sort
 void isort(RestDist dist[],int len){
   int i;
@@ -148,6 +140,7 @@ int main() {
 
   restaurant rest;
   int lt, ln;
+  int restaurantCounter;
 
   //manhatten(longitude, latitude);
   for (int i=0; i < 1067;i++){
@@ -168,19 +161,29 @@ int main() {
       Serial.print("    this is rest_dist: ");
       Serial.println(rest_dist[i].dist);
       */
-
   }
 
   isort(rest_dist,NUM_RESTAURANTS);
   // maybe only need to show to 30
-  for (int i=0; i < 1067;i++){
+  for (int i=0; i < 30;i++){
     Serial.print(" this is index: ");
     Serial.print(rest_dist[i].index);
     Serial.print("    this is rest_dist: ");
     Serial.println(rest_dist[i].dist);
   }
 
+  for (int i=0; i < 30;i++){
+    getRestaurantFast(rest_dist[i].index, &rest);
 
+    Serial.print("this is index: ");
+    Serial.print(rest_dist[i].index);
+    Serial.print("  ");
+    Serial.print(i);
+    Serial.print(" ");
+    Serial.println(rest.name);
+
+
+  }
 
 
   Serial.end();
