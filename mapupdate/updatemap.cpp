@@ -48,6 +48,8 @@ lcd_image_t yegImage = { "yeg-big.lcd", LCD_WIDTH, LCD_HEIGHT };
 // the cursor position on the display, stored as the middle pixel of the cursor
 int cursorX, cursorY;
 int left, right;
+int xposcursor = 0;
+int yposcursor = 0;
 
 // upper-left coordinates in the image of the middle of the map of Edmonton
 #define YEG_MIDDLE_X (LCD_WIDTH/2 - MAP_DISP_WIDTH/2)
@@ -108,35 +110,43 @@ void redrawCursor(int newX, int newY, int oldX, int oldY) {
 }
 
 
+void cursorlocation() {
+  xposcursor = mapx + cursorX;
+  yposcursor = mapy + cursorY;
+  xposcursor = constrain(xposcursor, 0, LCD_WIDTH);
+  yposcursor = constrain(yposcursor, 0, LCD_HEIGHT);
 
+}
 
 
 
 
 void screenupdate() {
+  mapx = constrain(mapx, 0, LCD_WIDTH);
+  mapy = constrain(mapy, 0, LCD_HEIGHT);
   if (cursorX == 0) {
-    mapx-=50;
+    mapx-=272;
     lcd_image_draw(&yegImage, &tft, mapx,
     mapy, 0, 0, MAP_DISP_WIDTH, MAP_DISP_HEIGHT);
 
     cursorX = 250;
   }
   if (cursorX == 263) {
-    mapx+=50;
+    mapx+=272;
     lcd_image_draw(&yegImage, &tft, mapx,
     mapy, 0, 0, MAP_DISP_WIDTH, MAP_DISP_HEIGHT);
 
     cursorX = 10;
   }
   if (cursorY == 0) {
-    mapy-=50;
+    mapy-=240;
     lcd_image_draw(&yegImage, &tft, mapx,
     mapy, 0, 0, MAP_DISP_WIDTH, MAP_DISP_HEIGHT);
 
     cursorY = 220;
   }
   if (cursorY == 231) {
-    mapy+=50;
+    mapy+=240;
     lcd_image_draw(&yegImage, &tft, mapx,
     mapy, 0, 0, MAP_DISP_WIDTH, MAP_DISP_HEIGHT);
 
@@ -171,9 +181,28 @@ void processJoystick() {
   // redraw the cursor only if its position actually changed
   if (cursorX != oldX || cursorY != oldY) {
 
-    Serial.println(cursorX);
-    Serial.println(cursorY);
+    // Serial.println(cursorX);
+    // Serial.println(cursorY);
     redrawCursor(cursorX, cursorY, oldX, oldY);
+    // Serial.print("X coords: ");
+    // Serial.println(xposcursor);
+    // Serial.print("Y coords: ");
+    // Serial.println(yposcursor);
+
+
+
+    Serial.print("X map, cursor, location: ");
+    Serial.print(mapx);
+    Serial.print(", ");
+    Serial.print(cursorX);
+    Serial.print(", ");
+    Serial.println(xposcursor);
+    Serial.print("Y map, cursor, location: ");
+    Serial.print(mapy);
+    Serial.print(", ");
+    Serial.print(cursorY);
+    Serial.print(", ");
+    Serial.println(yposcursor);
   }
 
   delay(10);
@@ -197,6 +226,7 @@ int main() {
   Serial.println(mapx);
   Serial.println(mapy);
   while (true) {
+    cursorlocation();
     processJoystick();
   }
 
