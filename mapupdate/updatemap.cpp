@@ -111,6 +111,8 @@ void redrawCursor(int newX, int newY, int oldX, int oldY) {
 
 
 void cursorlocation() {
+  // right now the cursorx and y is counting from the edge of the
+  // cursor, not the right edge though
   xposcursor = mapx + cursorX;
   yposcursor = mapy + cursorY;
   xposcursor = constrain(xposcursor, 0, LCD_WIDTH);

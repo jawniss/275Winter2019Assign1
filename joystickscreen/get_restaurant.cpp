@@ -74,6 +74,26 @@ void drawName(uint16_t index){
 }
 // refresh the display and dispay all names
 // do not change the highlighred stirng
+void displayAllNamesPage2(){
+  tft.fillScreen(ILI9341_BLACK); // fill it in black
+
+  for (uint16_t i=0; i< 14; i++){ // loop thorugh all names and draw them Note it can only draw 15 names on the screen
+
+		  tft.setCursor(0,i*15); // should be on the left each word is 8 bit high (its in the adafruit graphicks library) we want size 2 so 7*2 +1 which is white space 1
+
+		  if(i == highlightedString){
+		    tft.setTextColor(ILI9341_BLACK, ILI9341_WHITE); // black with white background
+		  }else {
+		    tft.setTextColor(ILI9341_WHITE, ILI9341_BLACK); // black with white background
+		  }
+		  tft.print("Page 2 number: ");
+			tft.println(i);
+		}
+  }
+
+
+
+
 void displayAllNames(){
   tft.fillScreen(ILI9341_BLACK); // fill it in black
 
@@ -82,7 +102,6 @@ void displayAllNames(){
     drawName(i);
   }
 }
-
 
 // a multimeter reading says there are 300 ohms of resistance across the plate,
 // so initialize with this to get more accurate readings
@@ -101,7 +120,7 @@ struct restaurant {
   int32_t lon;
   uint8_t rating; // from 0 to 10
   char name[55];
-}; restaurant
+}; restaurant rest;
 
 // setup function
 void setup() {
@@ -182,6 +201,10 @@ int main() {
       drawName(prevHighlight);
       drawName(highlightedString);
     }
+		if (highlightedString >= 15) {
+			highlightedString = 0;
+			displayAllNamesPage2();
+		}
     Serial.print("this is the current name");
     Serial.println(highlightedString);
     delay (50);
