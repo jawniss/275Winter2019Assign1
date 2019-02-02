@@ -75,7 +75,7 @@ void setup() {
 	tft.fillScreen(ILI9341_BLACK);
 	tft.setRotation(3);
 
-  tft.setTextSize(2);
+  tft.setTextSize(1);
   tft.setTextWrap(false);// roll of the edge and not wrap around
   // if you put true it displays the last line over
 
@@ -183,13 +183,17 @@ void drawName(uint16_t index){
 // first 15
 void drawName(uint16_t selectedRest){
   //selectedRest = 0; // which restaurant is selected ?
-  for ( int16_t i = 0; i < 15; i ++) {
-
+  tft.setCursor(0,0);
+  //tft.setTextColor(ILI9341_BLACK, ILI9341_BLACK);
+  tft.setTextSize(1);
+  for ( int16_t i = 0; i < 30; i ++) {
     getRestaurantFast(rest_dist[i].index , &rest) ;
+    /*
     Serial.print(" this is i: ");
     Serial.println(i);
     Serial.print(" this is selectedRest: ");
     Serial.println(selectedRest);
+    */
     if(i == selectedRest){ // highlight
       // white characters on black background
       tft.setTextColor(ILI9341_BLACK, ILI9341_WHITE);
@@ -199,8 +203,40 @@ void drawName(uint16_t selectedRest){
       tft.setTextColor(ILI9341_WHITE, ILI9341_BLACK);
       }
       tft.println(rest.name);
+      /*
+      tft.setTextColor(ILI9341_WHITE, ILI9341_BLACK);
+      tft.println("                     ");
+      */
     }
-  tft.print ("\n") ;
+  //tft.print ("\n") ;
+}
+
+void drawNameP2(uint16_t selectedRest){
+  //selectedRest = 0; // which restaurant is selected ?
+  tft.setCursor(0,0);
+  //tft.setTextColor(ILI9341_BLACK, ILI9341_BLACK);
+  tft.setTextSize(1);
+  for ( int16_t i = 15; i < 30; i ++) {
+    getRestaurantFast(rest_dist[i].index , &rest) ;
+    /*
+    Serial.print(" this is i: ");
+    Serial.println(i);
+    Serial.print(" this is selectedRest: ");
+    Serial.println(selectedRest);
+    */
+    if(i == selectedRest){ // highlight
+      // white characters on black background
+      tft.setTextColor(ILI9341_BLACK, ILI9341_WHITE);
+    }
+    else { // not highlighted
+      // black characters on white background
+      tft.setTextColor(ILI9341_WHITE, ILI9341_BLACK);
+      }
+      tft.print(rest.name);
+      // need this to overwrite if name is too long from previous
+      tft.setTextColor(ILI9341_WHITE, ILI9341_BLACK);
+      tft.println("                     ");
+    }
 }
 
 /*
@@ -245,13 +281,15 @@ int main() {
 
   isort(rest_dist,NUM_RESTAURANTS);
   // maybe only need to show to 30
+  /*
   for (int i=0; i < 30;i++){
     Serial.print(" this is index: ");
     Serial.print(rest_dist[i].index);
     Serial.print("    this is rest_dist: ");
     Serial.println(rest_dist[i].dist);
   }
-
+  */
+  /*
   for (int i=0; i < 30;i++){
     getRestaurantFast(rest_dist[i].index, &rest);
     Serial.print("this is index: ");
@@ -261,9 +299,10 @@ int main() {
     Serial.print(" ");
     Serial.println(rest.name);
   }
+  */
   position = 0;// always start with first restaurant
   //displayFirsthalf();
-  Serial.println(" before while loop ");
+  //Serial.println(" before while loop ");
   drawName(position);
   while(true){
     // if statement for if its on the 16- blank names go to a different function that draws the next few names
@@ -271,13 +310,18 @@ int main() {
     int yVal = analogRead(JOY_VERT);
     int buttonVal = digitalRead(JOY_SEL);
     //uint16_t prevHighlight = highlightedString;
-    Serial.println(" inside while loop ");// entered while loop
+    //Serial.println(" inside while loop ");// entered while loop
     if (yVal >= (JOY_CENTER + JOY_DEADZONE)){ // this is to move down
       position++;
+      if (position > 29){
+        position = 0;
+      }
       //Serial.println(" pushed down ");
       //Serial.println(position);
       //highlightedString = (highlightedString+1)%NUM_NAMES_PER_PAGE; //highlighted one will be lower one since you pushed down
+
       drawName(position);
+
       /*
       drawName(prevHighlight);
       drawName(highlightedString);
@@ -285,6 +329,9 @@ int main() {
     } else if (yVal <= (JOY_CENTER - JOY_DEADZONE) ){ // this is move up
       //highlightedString = (highlightedString-1)%NUM_NAMES_PER_PAGE;
       position--;
+      if (position < 0){
+        position = 29;
+      }
       //Serial.println(" pushed up ");
       //Serial.println(position);
       drawName(position);
@@ -301,7 +348,7 @@ int main() {
     Serial.print("this is the current name");
     Serial.println(highlightedString);
     */
-    delay (500);
+    delay (50);
 
 
     // Change the highlighted names with joysticks (done) (even works where if you go pass the top you go to bot and vice versa)
