@@ -189,7 +189,7 @@ void setup() {
               }
             }
             if (cursorY == 231) {
-              if (mapy + 240 <= 1776) {
+              if (mapy + 240 <= 1808) {
                 mapy+=240;
                 lcd_image_draw(&yegImage, &tft, mapx,
                   mapy, 0, 0, MAP_DISP_WIDTH, MAP_DISP_HEIGHT);
