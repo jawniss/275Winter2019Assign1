@@ -156,6 +156,7 @@ void setup() {
 
 
     void screenupdate() {
+
       mapx = constrain(mapx, 0, MAP_WIDTH);
       mapy = constrain(mapy, 0, MAP_HEIGHT);
       if (cursorX == 0) {
@@ -163,9 +164,12 @@ void setup() {
           mapx-=272;
           lcd_image_draw(&yegImage, &tft, mapx,
             mapy, 0, 0, MAP_DISP_WIDTH, MAP_DISP_HEIGHT);
-            cursorX = 250;
-          } else {
+            cursorX = 262;
+          } else if (mapx != 0){
             mapx = 0;
+            lcd_image_draw(&yegImage, &tft, mapx,
+              mapy, 0, 0, MAP_DISP_WIDTH, MAP_DISP_HEIGHT);
+              cursorX = 262;
           }
         }
         if (cursorX == 263) {
@@ -173,9 +177,12 @@ void setup() {
             mapx+=272;
             lcd_image_draw(&yegImage, &tft, mapx,
               mapy, 0, 0, MAP_DISP_WIDTH, MAP_DISP_HEIGHT);
-              cursorX = 10;
-            } else {
+              cursorX = 1;
+            } else if (mapx != 1776){
               mapx = 1776;
+              lcd_image_draw(&yegImage, &tft, mapx,
+                mapy, 0, 0, MAP_DISP_WIDTH, MAP_DISP_HEIGHT);
+                cursorX = 1;
             }
           }
           if (cursorY == 0) {
@@ -183,9 +190,12 @@ void setup() {
               mapy-=240;
               lcd_image_draw(&yegImage, &tft, mapx,
                 mapy, 0, 0, MAP_DISP_WIDTH, MAP_DISP_HEIGHT);
-                cursorY = 220;
-              } else {
+                cursorY = 229;
+              } else if (mapy != 0){
                 mapy = 0;
+                lcd_image_draw(&yegImage, &tft, mapx,
+                  mapy, 0, 0, MAP_DISP_WIDTH, MAP_DISP_HEIGHT);
+                  cursorY = 229;
               }
             }
             if (cursorY == 231) {
@@ -193,9 +203,12 @@ void setup() {
                 mapy+=240;
                 lcd_image_draw(&yegImage, &tft, mapx,
                   mapy, 0, 0, MAP_DISP_WIDTH, MAP_DISP_HEIGHT);
-                  cursorY = 10;
-                } else {
+                  cursorY = 1;
+                } else if (mapy != 1808){
                   mapy = 1808;
+                  lcd_image_draw(&yegImage, &tft, mapx,
+                    mapy, 0, 0, MAP_DISP_WIDTH, MAP_DISP_HEIGHT);
+                    cursorY = 1;
                 }
               }
             }
