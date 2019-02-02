@@ -2,10 +2,19 @@
 #include <Adafruit_GFX.h>
 #include <Adafruit_ILI9341.h>
 #include <SD.h>
+#include <TouchScreen.h>
 
 #define TFT_DC 9
 #define TFT_CS 10
 #define SD_CS 6
+
+// physical dimensions of the tft display (# of pixels)
+#define DISPLAY_WIDTH  320
+#define DISPLAY_HEIGHT 240
+
+// dimensions of the part allocated to the map display
+#define MAP_DISP_WIDTH (DISPLAY_WIDTH - 48)
+#define MAP_DISP_HEIGHT DISPLAY_HEIGHT
 
 #define REST_START_BLOCK 4000000
 #define NUM_RESTAURANTS 1066
@@ -16,6 +25,15 @@
 # define LAT_SOUTH 5340953l
 # define LON_WEST -11368652l
 # define LON_EAST -11333496l
+
+#define JOY_VERT  A1
+#define JOY_HORIZ A0
+#define JOY_SEL   2
+
+#define JOY_CENTER   512
+#define JOY_DEADZONE 64
+
+#define NUM_NAMES_PER_PAGE 15;
 
 Adafruit_ILI9341 tft = Adafruit_ILI9341(TFT_CS, TFT_DC);
 
@@ -33,6 +51,7 @@ struct restaurant {
   uint8_t rating; // from 0 to 10
   char name[55];
 };
+restaurant rest;
 uint32_t lastBlockNum = REST_START_BLOCK-1;
 restaurant restBlock[8];
 
@@ -42,15 +61,23 @@ struct RestDist {
 };
 RestDist rest_dist[NUM_RESTAURANTS];
 
-// int latitude[1067];
-// int longitude[1067];
+int16_t position;
+
+
 
 void setup() {
   init();
   Serial.begin(9600);
 
-  tft.begin();
-  tft.fillScreen(ILI9341_BLACK);
+  pinMode(JOY_SEL, INPUT_PULLUP);
+
+	tft.begin();
+	tft.fillScreen(ILI9341_BLACK);
+	tft.setRotation(3);
+
+  tft.setTextSize(2);
+  tft.setTextWrap(false);// roll of the edge and not wrap around
+  // if you put true it displays the last line over
 
   Serial.print("Initializing SPI communication for raw reads...");
   // SPI Speed can be SPI_FULL_SPEED, SPI_HALF_SPEED or SPI_QUARTER_SPEED.
@@ -85,8 +112,8 @@ void getRestaurantFast(int restIndex, restaurant* restPtr) {
 
 // void manhatten(current location x, all restaurantx, current location y, all restauranty){
 int manhatten(int restx, int resty){
-  int currentx = 0; // comment out these two when you have postion from cursor
-  int currenty = 0;
+  int currentx = 2048; // comment out these two when you have postion from cursor
+  int currenty = 2048;
   int distance;
   distance = abs(currentx - restx) + abs(currenty - resty);
   return distance;
@@ -133,6 +160,59 @@ void isort(RestDist dist[],int len){
     i = i+1;
   }
 }
+
+/*
+void drawName(uint16_t index){
+  tft.setCursor(0,index*15); // should be on the left each word is 8 bit high (its in the adafruit graphicks library) we want size 2 so 7*2 +1 which is white space 1
+  // fetches the restaurant at that index
+  highlightedString = rest_dist;
+  getRestaurantFast(rest_dist[index].index, &rest);
+
+  Serial.print("this is rest_dist[index]");
+  Serial.println(rest_dist);
+
+  if(index == rest_dist){ // if it matchs do this
+    tft.setTextColor(ILI9341_BLACK, ILI9341_WHITE); // black with white background
+  }else { // else show not selected
+    tft.setTextColor(ILI9341_WHITE, ILI9341_BLACK); // black with white background
+  }
+  // print restaurant name
+  tft.println(rest.name);
+}
+*/
+// first 15
+void drawName(uint16_t selectedRest){
+  //selectedRest = 0; // which restaurant is selected ?
+  for ( int16_t i = 0; i < 15; i ++) {
+
+    getRestaurantFast(rest_dist[i].index , &rest) ;
+    Serial.print(" this is i: ");
+    Serial.println(i);
+    Serial.print(" this is selectedRest: ");
+    Serial.println(selectedRest);
+    if(i == selectedRest){ // highlight
+      // white characters on black background
+      tft.setTextColor(ILI9341_BLACK, ILI9341_WHITE);
+    }
+    else { // not highlighted
+      // black characters on white background
+      tft.setTextColor(ILI9341_WHITE, ILI9341_BLACK);
+      }
+      tft.println(rest.name);
+    }
+  tft.print ("\n") ;
+}
+
+/*
+void displayFirsthalf(){
+  tft.fillScreen(ILI9341_BLACK); // fill it in black
+
+  for (uint16_t i=0; i < 15; i++){ // loop thorugh all names and draw them Note it can only draw 15 names on the screen
+
+    drawName(i);
+  }
+}
+*/
 
 
 int main() {
@@ -181,6 +261,57 @@ int main() {
     Serial.print(" ");
     Serial.println(rest.name);
   }
+  position = 0;// always start with first restaurant
+  //displayFirsthalf();
+  Serial.println(" before while loop ");
+  drawName(position);
+  while(true){
+    // if statement for if its on the 16- blank names go to a different function that draws the next few names
+    // reread the joystick everytime to check if a valid tilt is inputed
+    int yVal = analogRead(JOY_VERT);
+    int buttonVal = digitalRead(JOY_SEL);
+    //uint16_t prevHighlight = highlightedString;
+    Serial.println(" inside while loop ");// entered while loop
+    if (yVal >= (JOY_CENTER + JOY_DEADZONE)){ // this is to move down
+      position++;
+      //Serial.println(" pushed down ");
+      //Serial.println(position);
+      //highlightedString = (highlightedString+1)%NUM_NAMES_PER_PAGE; //highlighted one will be lower one since you pushed down
+      drawName(position);
+      /*
+      drawName(prevHighlight);
+      drawName(highlightedString);
+      */
+    } else if (yVal <= (JOY_CENTER - JOY_DEADZONE) ){ // this is move up
+      //highlightedString = (highlightedString-1)%NUM_NAMES_PER_PAGE;
+      position--;
+      //Serial.println(" pushed up ");
+      //Serial.println(position);
+      drawName(position);
+      /*
+      drawName(prevHighlight);
+      drawName(highlightedString);
+      */
+    }
+    /*
+		if (highlightedString >= 15) {
+			highlightedString = 0;
+			displayAllNamesPage2();
+		}
+    Serial.print("this is the current name");
+    Serial.println(highlightedString);
+    */
+    delay (500);
+
+
+    // Change the highlighted names with joysticks (done) (even works where if you go pass the top you go to bot and vice versa)
+    // add more names than can be dipslayed on one screen, and
+    // go to the " next page" of names if you select far enough down
+  }
+
+
+
+
 
 
   Serial.end();

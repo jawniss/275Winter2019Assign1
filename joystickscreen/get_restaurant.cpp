@@ -65,6 +65,11 @@ const char *stringsToDisplay[] = {
 void drawName(uint16_t index){
   tft.setCursor(0,index*15); // should be on the left each word is 8 bit high (its in the adafruit graphicks library) we want size 2 so 7*2 +1 which is white space 1
 
+	Serial.print("this is index: ");
+	Serial.println(index);
+	Serial.print("this is highlighted String: ");
+	Serial.println(highlightedString);
+
   if(index == highlightedString){
     tft.setTextColor(ILI9341_BLACK, ILI9341_WHITE); // black with white background
   }else {
@@ -205,8 +210,14 @@ int main() {
 			highlightedString = 0;
 			displayAllNamesPage2();
 		}
-    Serial.print("this is the current name");
-    Serial.println(highlightedString);
+		/*
+		if (highlightedString < 15 ){
+			highlightedString = 0;
+			displayAllNames();
+		}
+*/
+    //Serial.print("this is the current name");
+    //Serial.println(highlightedString);
     delay (50);
 
 
