@@ -1,4 +1,4 @@
-build-mega2560/updatemap.o: updatemap.cpp \
+build-mega2560/distCalc.o: distCalc.cpp \
  /usr/share/arduino/hardware/arduino//cores/arduino/Arduino.h \
  /usr/share/arduino/hardware/arduino//cores/arduino/binary.h \
  /usr/share/arduino/hardware/arduino//cores/arduino/WCharacter.h \
