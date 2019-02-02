@@ -78,11 +78,13 @@ RestDist rest_dist[NUM_RESTAURANTS];
 
 int16_t position;
 
+/*
 int xVal;
 int yVal;
 int buttonVal;
 int oldX;
 int oldY;
+*/
 
 // forward declaration for drawing the cursor
 void redrawCursor(int newX, int newY, int oldX, int oldY);
@@ -94,6 +96,14 @@ void setup() {
   pinMode(JOY_SEL, INPUT_PULLUP);
 
 	tft.begin();
+
+  Serial.print("Initializing SD card...");
+	if (!SD.begin(SD_CS)) {
+		Serial.println("failed! Is it inserted properly?");
+		while (true) {}
+	}
+	Serial.println("OK!");
+
 	tft.fillScreen(ILI9341_BLACK);
 	tft.setRotation(3);
 
@@ -186,10 +196,13 @@ void screenupdate() {
 
 
 void processJoystick() {
+  int xVal = analogRead(JOY_HORIZ);
+  int yVal = analogRead(JOY_VERT);
+  int buttonVal = digitalRead(JOY_SEL);
 
   // copy the cursor position (to check later if it changed)
-  oldX = cursorX;
-  oldY = cursorY;
+  int oldX = cursorX;
+  int oldY = cursorY;
 
   // move the cursor, further pushes mean faster movement
   cursorX += (JOY_CENTER - xVal) / JOY_SPEED;
@@ -262,10 +275,10 @@ void getRestaurantFast(int restIndex, restaurant* restPtr) {
 }
 
 
-// void manhatten(current location x, all restaurantx, current location y, all restauranty){
-int manhatten(int restx, int resty){
-  int currentx = 2048; // comment out these two when you have postion from cursor
-  int currenty = 2048;
+int manhatten(int currentx, int restx, int currenty, int resty){
+//int manhatten(int restx, int resty){
+  //int currentx = 2048; // comment out these two when you have postion from cursor
+  //int currenty = 2048;
   int distance;
   distance = abs(currentx - restx) + abs(currenty - resty);
   return distance;
@@ -347,17 +360,38 @@ int main() {
   while (true){
     cursorlocation();
     processJoystick();
-    if (buttonVal == 0){// button pushed
+    int checkButton = digitalRead(JOY_SEL);
+    if (checkButton == 0){// button pushed
 
       for (int i=0; i < 1067;i++){
         getRestaurantFast(i, &rest); // first value tells you what restaurant that number is and allows you to look for it directly
           // what you do is find the manhatten dist of closest one
           ln = lon_to_x(rest.lon) ;
           lt = lat_to_y(rest.lat);
-          rest_dist[i].dist = manhatten(ln,lt);
+          rest_dist[i].dist = manhatten(xposcursor,ln,yposcursor,lt);
           rest_dist[i].index = i;
       }
       isort(rest_dist,NUM_RESTAURANTS);
+
+      for (int i=0; i < 30;i++){
+        Serial.print(" this is index: ");
+        Serial.print(rest_dist[i].index);
+        Serial.print("    this is rest_dist: ");
+        Serial.println(rest_dist[i].dist);
+      }
+
+      
+      for (int i=0; i < 30;i++){
+        getRestaurantFast(rest_dist[i].index, &rest);
+        Serial.print("this is index: ");
+        Serial.print(rest_dist[i].index);
+        Serial.print("  ");
+        Serial.print(i);
+        Serial.print(" ");
+        Serial.println(rest.name);
+      }
+
+      tft.fillScreen(ILI9341_BLACK);// draw the screen all black first
       position = 0;// always start with first restaurant
       drawName(position);
       while(true){
