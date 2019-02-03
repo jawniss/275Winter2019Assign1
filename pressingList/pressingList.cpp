@@ -374,7 +374,6 @@ void drawName(uint16_t selectedRest){
 
 int main() {
   setup();
-
   restaurant rest;
   int lt, ln;
   int restaurantCounter;
@@ -400,15 +399,24 @@ int main() {
       lcd_image_draw(&yegImage, &tft, mapx, mapy,
         0, 0, MAP_DISP_WIDTH, MAP_DISP_HEIGHT);
 
+        Serial.print("mapx: ");
+        Serial.println(mapx);
 
-
+        Serial.print("mapy: ");
+        Serial.println(mapy);
+        //
+        // Serial.print("Xchosenrest%263: ");
+        // Serial.println(Xchosenrest%263);
+        //
+        // Serial.print("Ychosenrest%231: ");
+        // Serial.println(Ychosenrest%231);
         // initial cursor position is the middle of the screen
         cursorX = (DISPLAY_WIDTH - 48 - CURSOR_SIZE)/2;
         cursorY = (DISPLAY_HEIGHT - CURSOR_SIZE)/2;
 
         // draw the initial cursor
         redrawCursor(cursorX, cursorY, cursorX, cursorY);
-        tft.fillRect(Xchosenrest%263, Ychosenrest%231, 10, 15, ILI9341_BLACK);
+        //tft.fillRect(Xchosenrest%263, Ychosenrest%231, 10, 10, ILI9341_BLACK);
       }
 
       if (checkButton == LOW){// button pushed
@@ -477,8 +485,13 @@ int main() {
             // map
             Xchosenrest = lon_to_x(rest.lon);
             Ychosenrest = lat_to_y(rest.lat);
-            mapx = Xchosenrest;
-            mapy = Ychosenrest;
+            mapx = Xchosenrest - 136;
+            mapy = Ychosenrest - 120;
+            Serial.print("Xchosenrest: ");
+            Serial.println(Xchosenrest);
+
+            Serial.print("Ychosenrest: ");
+            Serial.println(Ychosenrest);
             Serial.println(rest.name);
             // cursorX = ln;
             // cursorY = lt;
@@ -499,3 +512,11 @@ int main() {
 
     return 0;
   }
+
+
+
+// FOR TAPPING THE SCREEN, MAKE IT TO DO THIS: IF IT REGISTERES
+// A TAP, THEN DO THE SAME THING AS SORTING. TAKE MAP X AND mapy
+// AND SAY IF THE XREST VAL IS BETWEEN MAPX AND MAPX + 272,
+// DRAW A CIRCLE ON IT
+// SAME FOR Y
