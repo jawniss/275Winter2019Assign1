@@ -160,7 +160,7 @@ void setup() {
       mapx = constrain(mapx, 0, MAP_WIDTH);
       mapy = constrain(mapy, 0, MAP_HEIGHT);
       if (cursorX == 0) {
-        if (mapx - 272 >= 0) {
+        if (mapx - 272 > 0) {
           mapx-=272;
           lcd_image_draw(&yegImage, &tft, mapx,
             mapy, 0, 0, MAP_DISP_WIDTH, MAP_DISP_HEIGHT);
@@ -173,7 +173,7 @@ void setup() {
           }
         }
         if (cursorX == 263) {
-          if (mapx + 272 <= 1776) {
+          if (mapx + 272 < 1776) {
             mapx+=272;
             lcd_image_draw(&yegImage, &tft, mapx,
               mapy, 0, 0, MAP_DISP_WIDTH, MAP_DISP_HEIGHT);
@@ -186,7 +186,7 @@ void setup() {
             }
           }
           if (cursorY == 0) {
-            if (mapy - 240 >= 0) {
+            if (mapy - 240 > 0) {
               mapy-=240;
               lcd_image_draw(&yegImage, &tft, mapx,
                 mapy, 0, 0, MAP_DISP_WIDTH, MAP_DISP_HEIGHT);
@@ -199,7 +199,7 @@ void setup() {
               }
             }
             if (cursorY == 231) {
-              if (mapy + 240 <= 1808) {
+              if (mapy + 240 < 1808) {
                 mapy+=240;
                 lcd_image_draw(&yegImage, &tft, mapx,
                   mapy, 0, 0, MAP_DISP_WIDTH, MAP_DISP_HEIGHT);
