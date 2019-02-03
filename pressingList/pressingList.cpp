@@ -376,15 +376,15 @@ void drawName(uint16_t selectedRest){
         if (i == selectedRest){
           getRestaurantFast(rest_dist[selectedRest].index , &rest);
           tft.setTextColor(ILI9341_BLACK, ILI9341_WHITE);
-          tft.print(rest.name);
-          tft.println("                                                     ");
+          tft.println(rest.name);
+          //tft.println("                                                     ");
         }
         else if(i == previousPosition){
           // highlight new one
           getRestaurantFast(rest_dist[previousPosition].index , &rest);
           tft.setTextColor(ILI9341_WHITE, ILI9341_BLACK);
-          tft.print(rest.name);
-          tft.println("                                                     ");
+          tft.println(rest.name);
+          //tft.println("                                                     ");
         }
         else{
           tft.setTextColor(ILI9341_WHITE, ILI9341_BLACK);
