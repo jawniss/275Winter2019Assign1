@@ -57,8 +57,6 @@ int yposcursor = 0;
 int mapx = 888;
 int mapy = 904;
 
-int mode = 0;
-
 // different than SD
 Sd2Card card;
 
@@ -158,6 +156,7 @@ void setup() {
 
 
     void screenupdate() {
+
       mapx = constrain(mapx, 0, MAP_WIDTH);
       mapy = constrain(mapy, 0, MAP_HEIGHT);
       if (cursorX == 0) {
@@ -165,9 +164,12 @@ void setup() {
           mapx-=272;
           lcd_image_draw(&yegImage, &tft, mapx,
             mapy, 0, 0, MAP_DISP_WIDTH, MAP_DISP_HEIGHT);
-            cursorX = 250;
-          } else {
+            cursorX = 262;
+          } else if (mapx != 0){
             mapx = 0;
+            lcd_image_draw(&yegImage, &tft, mapx,
+              mapy, 0, 0, MAP_DISP_WIDTH, MAP_DISP_HEIGHT);
+              cursorX = 262;
           }
         }
         if (cursorX == 263) {
@@ -175,9 +177,12 @@ void setup() {
             mapx+=272;
             lcd_image_draw(&yegImage, &tft, mapx,
               mapy, 0, 0, MAP_DISP_WIDTH, MAP_DISP_HEIGHT);
-              cursorX = 10;
-            } else {
+              cursorX = 1;
+            } else if (mapx != 1776){
               mapx = 1776;
+              lcd_image_draw(&yegImage, &tft, mapx,
+                mapy, 0, 0, MAP_DISP_WIDTH, MAP_DISP_HEIGHT);
+                cursorX = 1;
             }
           }
           if (cursorY == 0) {
@@ -185,9 +190,12 @@ void setup() {
               mapy-=240;
               lcd_image_draw(&yegImage, &tft, mapx,
                 mapy, 0, 0, MAP_DISP_WIDTH, MAP_DISP_HEIGHT);
-                cursorY = 220;
-              } else {
+                cursorY = 229;
+              } else if (mapy != 0){
                 mapy = 0;
+                lcd_image_draw(&yegImage, &tft, mapx,
+                  mapy, 0, 0, MAP_DISP_WIDTH, MAP_DISP_HEIGHT);
+                  cursorY = 229;
               }
             }
             if (cursorY == 231) {
@@ -195,9 +203,12 @@ void setup() {
                 mapy+=240;
                 lcd_image_draw(&yegImage, &tft, mapx,
                   mapy, 0, 0, MAP_DISP_WIDTH, MAP_DISP_HEIGHT);
-                  cursorY = 10;
-                } else {
+                  cursorY = 1;
+                } else if (mapy != 1808){
                   mapy = 1808;
+                  lcd_image_draw(&yegImage, &tft, mapx,
+                    mapy, 0, 0, MAP_DISP_WIDTH, MAP_DISP_HEIGHT);
+                    cursorY = 1;
                 }
               }
             }
@@ -364,15 +375,22 @@ void setup() {
               restaurant rest;
               int lt, ln;
               int restaurantCounter;
+              int mode = 0;
+              int checkButton;
 
               Serial.println(mapx);
               Serial.println(mapy);
               while (true){
                 cursorlocation();
                 processJoystick();
-                int checkButton = digitalRead(JOY_SEL);
-                if (checkButton == 0){// button pushed
-                  mode = 1;// change to list mode
+
+                Serial.print("waiting to enter list this is button postion: ");
+                checkButton = digitalRead(JOY_SEL);
+                Serial.println(digitalRead(JOY_SEL));
+                if (checkButton == LOW){// button pushed
+
+                  Serial.println("button pressed entering list: ");
+                  mode = 1;
                   for (int i=0; i < 1067;i++){
                     getRestaurantFast(i, &rest); // first value tells you what restaurant that number is and allows you to look for it directly
                     // what you do is find the manhatten dist of closest one
@@ -383,10 +401,28 @@ void setup() {
                   }
                   isort(rest_dist,NUM_RESTAURANTS);
 
+                  for (int i=0; i < 30;i++){
+                    Serial.print(" this is index: ");
+                    Serial.print(rest_dist[i].index);
+                    Serial.print("    this is rest_dist: ");
+                    Serial.println(rest_dist[i].dist);
+                  }
+
+
+                  for (int i=0; i < 30;i++){
+                    getRestaurantFast(rest_dist[i].index, &rest);
+                    Serial.print("this is index: ");
+                    Serial.print(rest_dist[i].index);
+                    Serial.print("  ");
+                    Serial.print(i);
+                    Serial.print(" ");
+                    Serial.println(rest.name);
+                  }
+
                   tft.fillScreen(ILI9341_BLACK);// draw the screen all black first
                   position = 0;// always start with first restaurant
                   drawName(position);
-                  while(mode != 0){
+                  while(mode!=0){
                     // if statement for if its on the 16- blank names go to a different function that draws the next few names
                     // reread the joystick everytime to check if a valid tilt is inputed
                     int yVal = analogRead(JOY_VERT);
@@ -402,12 +438,15 @@ void setup() {
                       if (position < 0){
                         position = 29;
                       }
-                      int checkButton = digitalRead(JOY_SEL);
-                      if (checkButton == 0){
-                        mode = 0;
-                        break;
-                      }
                       drawName(position);
+                    }
+
+                    checkButton = digitalRead(JOY_SEL);
+                    Serial.println("checking if button is pressed inside list ");
+                    if (checkButton == LOW){
+                    Serial.println("button pressed should exit list: ");
+                      mode = 0;
+                      delay(950);
                     }
                     delay (50);
                   }
