@@ -377,6 +377,7 @@ void setup() {
               int restaurantCounter;
               int mode = 0;
               int checkButton;
+              int swapToScreen = 0;
 
               Serial.println(mapx);
               Serial.println(mapy);
@@ -387,8 +388,24 @@ void setup() {
                 Serial.print("waiting to enter list this is button postion: ");
                 checkButton = digitalRead(JOY_SEL);
                 Serial.println(digitalRead(JOY_SEL));
-                if (checkButton == LOW){// button pushed
 
+                if (swapToScreen != 0){
+                  swapToScreen = 0;
+                  Serial.println("returned properly to map: ");
+                  // draws the centre of the Edmonton map, leaving the rightmost 48 columns black
+
+                  lcd_image_draw(&yegImage, &tft, YEG_MIDDLE_X, YEG_MIDDLE_Y,
+                    0, 0, MAP_DISP_WIDTH, MAP_DISP_HEIGHT);
+
+                    // initial cursor position is the middle of the screen
+                    cursorX = (DISPLAY_WIDTH - 48 - CURSOR_SIZE)/2;
+                    cursorY = (DISPLAY_HEIGHT - CURSOR_SIZE)/2;
+
+                    // draw the initial cursor
+                    redrawCursor(cursorX, cursorY, cursorX, cursorY);
+                }
+
+                if (checkButton == LOW){// button pushed
                   Serial.println("button pressed entering list: ");
                   mode = 1;
                   for (int i=0; i < 1067;i++){
@@ -446,6 +463,7 @@ void setup() {
                     if (checkButton == LOW){
                     Serial.println("button pressed should exit list: ");
                       mode = 0;
+                      swapToScreen = 1;
                       delay(950);
                     }
                     delay (50);
