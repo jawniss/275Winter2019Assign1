@@ -81,6 +81,11 @@ RestDist rest_dist[NUM_RESTAURANTS];
 
 int16_t position;
 
+// global variable to know which index of restaurant selected
+int currentRest = 0;
+int longitude;
+int latitude;
+
 /*
 int xVal;
 int yVal;
@@ -396,6 +401,16 @@ int main() {
       Serial.println("returned properly to map: ");
       // draws the centre of the Edmonton map, leaving the rightmost 48 columns black
 
+      // call the selected restaurant
+      getRestaurantFast(rest_dist[currentRest].index, &rest);
+      // obtain longitude and latitude of selected restaurant
+      longitude = lon_to_x(rest.lon);
+      Serial.print("this is selected rest longitude: ");
+      Serial.println(longitude);
+      latitude = lat_to_y(rest.lat);
+      Serial.print("this is selected rest latitude: ");
+      Serial.println(latitude);
+
       lcd_image_draw(&yegImage, &tft, mapx, mapy,
         0, 0, MAP_DISP_WIDTH, MAP_DISP_HEIGHT);
 
@@ -429,6 +444,7 @@ int main() {
           lt = lat_to_y(rest.lat);
           rest_dist[i].dist = manhatten(xposcursor,ln,yposcursor,lt);
           rest_dist[i].index = i;
+
         }
         isort(rest_dist,NUM_RESTAURANTS);
 
