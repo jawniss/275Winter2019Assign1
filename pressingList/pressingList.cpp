@@ -78,6 +78,11 @@ RestDist rest_dist[NUM_RESTAURANTS];
 
 int16_t position;
 
+// global variable to know which index of restaurant selected
+int currentRest = 0;
+int longitude;
+int latitude;
+
 /*
 int xVal;
 int yVal;
@@ -160,7 +165,7 @@ void setup() {
       mapx = constrain(mapx, 0, MAP_WIDTH);
       mapy = constrain(mapy, 0, MAP_HEIGHT);
       if (cursorX == 0) {
-        if (mapx - 272 >= 0) {
+        if (mapx - 272 > 0) {
           mapx-=272;
           lcd_image_draw(&yegImage, &tft, mapx,
             mapy, 0, 0, MAP_DISP_WIDTH, MAP_DISP_HEIGHT);
@@ -173,7 +178,7 @@ void setup() {
           }
         }
         if (cursorX == 263) {
-          if (mapx + 272 <= 1776) {
+          if (mapx + 272 < 1776) {
             mapx+=272;
             lcd_image_draw(&yegImage, &tft, mapx,
               mapy, 0, 0, MAP_DISP_WIDTH, MAP_DISP_HEIGHT);
@@ -186,7 +191,7 @@ void setup() {
             }
           }
           if (cursorY == 0) {
-            if (mapy - 240 >= 0) {
+            if (mapy - 240 > 0) {
               mapy-=240;
               lcd_image_draw(&yegImage, &tft, mapx,
                 mapy, 0, 0, MAP_DISP_WIDTH, MAP_DISP_HEIGHT);
@@ -199,7 +204,7 @@ void setup() {
               }
             }
             if (cursorY == 231) {
-              if (mapy + 240 <= 1808) {
+              if (mapy + 240 < 1808) {
                 mapy+=240;
                 lcd_image_draw(&yegImage, &tft, mapx,
                   mapy, 0, 0, MAP_DISP_WIDTH, MAP_DISP_HEIGHT);
@@ -357,6 +362,7 @@ void setup() {
               for ( int16_t i = 0; i < 30; i ++) {
                 getRestaurantFast(rest_dist[i].index , &rest) ;
                 if(i == selectedRest){ // highlight
+                  currentRest = selectedRest;
                   // white characters on black background
                   tft.setTextColor(ILI9341_BLACK, ILI9341_WHITE);
                 }
@@ -385,14 +391,23 @@ void setup() {
                 cursorlocation();
                 processJoystick();
 
-                Serial.print("waiting to enter list this is button postion: ");
+                //Serial.print("waiting to enter list this is button postion: ");
                 checkButton = digitalRead(JOY_SEL);
-                Serial.println(digitalRead(JOY_SEL));
+                //Serial.println(digitalRead(JOY_SEL));
 
                 if (swapToScreen != 0){
                   swapToScreen = 0;
                   Serial.println("returned properly to map: ");
                   // draws the centre of the Edmonton map, leaving the rightmost 48 columns black
+
+                  // call the selected restaurant
+                  getRestaurantFast(rest_dist[currentRest].index, &rest);
+                  longitude = lon_to_x(rest.lon);
+                  Serial.print("this is selected rest longitude: ");
+                  Serial.println(longitude);
+                  latitude = lat_to_y(rest.lat);
+                  Serial.print("this is selected rest latitude: ");
+                  Serial.println(latitude);
 
                   lcd_image_draw(&yegImage, &tft, YEG_MIDDLE_X, YEG_MIDDLE_Y,
                     0, 0, MAP_DISP_WIDTH, MAP_DISP_HEIGHT);
@@ -406,15 +421,16 @@ void setup() {
                 }
 
                 if (checkButton == LOW){// button pushed
-                  Serial.println("button pressed entering list: ");
+                  //Serial.println("button pressed entering list: ");
                   mode = 1;
                   for (int i=0; i < 1067;i++){
                     getRestaurantFast(i, &rest); // first value tells you what restaurant that number is and allows you to look for it directly
                     // what you do is find the manhatten dist of closest one
-                    ln = lon_to_x(rest.lon) ;
+                    ln = lon_to_x(rest.lon);
                     lt = lat_to_y(rest.lat);
                     rest_dist[i].dist = manhatten(xposcursor,ln,yposcursor,lt);
                     rest_dist[i].index = i;
+
                   }
                   isort(rest_dist,NUM_RESTAURANTS);
 
@@ -459,9 +475,9 @@ void setup() {
                     }
 
                     checkButton = digitalRead(JOY_SEL);
-                    Serial.println("checking if button is pressed inside list ");
+                    //Serial.println("checking if button is pressed inside list ");
                     if (checkButton == LOW){
-                    Serial.println("button pressed should exit list: ");
+                    //Serial.println("button pressed should exit list: ");
                       mode = 0;
                       swapToScreen = 1;
                       delay(950);
