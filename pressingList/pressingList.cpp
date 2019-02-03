@@ -57,6 +57,9 @@ int yposcursor = 0;
 int mapx = 888;
 int mapy = 904;
 
+int Xchosenrest = 0;
+int Ychosenrest = 0;
+
 // different than SD
 Sd2Card card;
 
@@ -77,15 +80,11 @@ struct RestDist {
 RestDist rest_dist[NUM_RESTAURANTS];
 
 int16_t position;
-int16_t previousPosition;
 
 // global variable to know which index of restaurant selected
 int currentRest = 0;
 int longitude;
 int latitude;
-int mode = 0;
-// drawing the list for first time
-int drawMode = 0;
 
 /*
 int xVal;
@@ -300,6 +299,7 @@ void getRestaurantFast(int restIndex, restaurant* restPtr) {
       Serial.println("Read block failed, trying again.");
     }
   }
+
   *restPtr = restBlock[restIndex % 8];
 }
 
@@ -362,51 +362,17 @@ void drawName(uint16_t selectedRest){
   tft.setCursor(0,0);
   //tft.setTextColor(ILI9341_BLACK, ILI9341_BLACK);
   tft.setTextSize(1);
-  //Serial.print("this is drawMode: ");
-  //Serial.println(drawMode);
-  if (drawMode!= 0){// if already drawn don't redraw whole thing
-  Serial.println("speed mode");
-    if (previousPosition != selectedRest){
-      // turn the previous one to unhighlighted
-      Serial.print("selectedRest: ");
-      Serial.println(selectedRest);
-      Serial.print("previousPosition: ");
-      Serial.println(previousPosition);
-      for ( int16_t i = 0; i < 30; i++) {
-        if (i == selectedRest){
-          getRestaurantFast(rest_dist[selectedRest].index , &rest);
-          tft.setTextColor(ILI9341_BLACK, ILI9341_WHITE);
-          tft.print(rest.name);
-          tft.println("                                                     ");
-        }
-        else if(i == previousPosition){
-          // highlight new one
-          getRestaurantFast(rest_dist[previousPosition].index , &rest);
-          tft.setTextColor(ILI9341_WHITE, ILI9341_BLACK);
-          tft.print(rest.name);
-          tft.println("                                                     ");
-        }
-        else{
-          tft.setTextColor(ILI9341_WHITE, ILI9341_BLACK);
-          tft.println("");
-        }
-      }
+  for ( int16_t i = 0; i < 30; i ++) {
+    getRestaurantFast(rest_dist[i].index , &rest) ;
+    if(i == selectedRest){ // highlight
+      // white characters on black background
+      tft.setTextColor(ILI9341_BLACK, ILI9341_WHITE);
     }
-  }
-  else{
-    for ( int16_t i = 0; i < 30; i ++) {
-      getRestaurantFast(rest_dist[i].index , &rest);
-      if(i == selectedRest){ // highlight
-        // black characters on white background
-        tft.setTextColor(ILI9341_BLACK, ILI9341_WHITE);
-      }
-      else { // not highlighted
-        // white characters on black background
-        tft.setTextColor(ILI9341_WHITE, ILI9341_BLACK);
-      }
-      tft.println(rest.name);
-      drawMode = 1;
+    else { // not highlighted
+      // black characters on white background
+      tft.setTextColor(ILI9341_WHITE, ILI9341_BLACK);
     }
+    tft.println(rest.name);
   }
 }
 
@@ -416,6 +382,7 @@ int main() {
   restaurant rest;
   int lt, ln;
   int restaurantCounter;
+  int mode = 0;
   int checkButton;
   int swapToScreen = 0;
 
@@ -435,7 +402,7 @@ int main() {
       // draws the centre of the Edmonton map, leaving the rightmost 48 columns black
 
       // call the selected restaurant
-      getRestaurantFast(rest_dist[position].index, &rest);
+      getRestaurantFast(rest_dist[currentRest].index, &rest);
       // obtain longitude and latitude of selected restaurant
       longitude = lon_to_x(rest.lon);
       Serial.print("this is selected rest longitude: ");
@@ -443,26 +410,6 @@ int main() {
       latitude = lat_to_y(rest.lat);
       Serial.print("this is selected rest latitude: ");
       Serial.println(latitude);
-
-      // the below are not the relative x and y coordinates
-      // to teh screen - they're the x and y's on the whole
-      // map
-
-      mapx = longitude - 136;
-      mapy = latitude - 120;
-      Serial.print("longitude: ");
-      Serial.println(longitude);
-
-      Serial.print("latitude: ");
-      Serial.println(latitude);
-      Serial.println(rest.name);
-      // cursorX = ln;
-      // cursorY = lt;
-      // int asesf = manhatten(xposcursor,ln,yposcursor,lt);
-      // Serial.println(asesf);
-      Serial.println(rest_dist[currentRest].index);
-      // pretty sure this delay is still happening
-      // when you're sleecting the restaurant list
 
       lcd_image_draw(&yegImage, &tft, mapx, mapy,
         0, 0, MAP_DISP_WIDTH, MAP_DISP_HEIGHT);
@@ -473,22 +420,23 @@ int main() {
         Serial.print("mapy: ");
         Serial.println(mapy);
         //
-        // Serial.print("longitude%263: ");
-        // Serial.println(longitude%263);
+        // Serial.print("Xchosenrest%263: ");
+        // Serial.println(Xchosenrest%263);
         //
-        // Serial.print("latitude%231: ");
-        // Serial.println(latitude%231);
+        // Serial.print("Ychosenrest%231: ");
+        // Serial.println(Ychosenrest%231);
         // initial cursor position is the middle of the screen
         cursorX = (DISPLAY_WIDTH - 48 - CURSOR_SIZE)/2;
         cursorY = (DISPLAY_HEIGHT - CURSOR_SIZE)/2;
 
         // draw the initial cursor
         redrawCursor(cursorX, cursorY, cursorX, cursorY);
-        //tft.fillRect(longitude%263, latitude%231, 10, 10, ILI9341_BLACK);
+        //tft.fillRect(Xchosenrest%263, Ychosenrest%231, 10, 10, ILI9341_BLACK);
       }
 
       if (checkButton == LOW){// button pushed
         Serial.println("button pressed entering list: ");
+        mode = 1;
         for (int i=0; i < 1067;i++){
           getRestaurantFast(i, &rest); // first value tells you what restaurant that number is and allows you to look for it directly
           // what you do is find the manhatten dist of closest one
@@ -499,7 +447,7 @@ int main() {
 
         }
         isort(rest_dist,NUM_RESTAURANTS);
-        /*
+
         for (int i=0; i < 30;i++){
           Serial.print(" this is index: ");
           Serial.print(rest_dist[i].index);
@@ -517,13 +465,9 @@ int main() {
           Serial.print(" ");
           Serial.println(rest.name);
         }
-        */
 
         tft.fillScreen(ILI9341_BLACK);// draw the screen all black first
         position = 0;// always start with first restaurant
-        mode = 1;
-        drawMode = 0;
-        previousPosition = position;
         drawName(position);
         while(mode!=0){
           // if statement for if its on the 16- blank names go to a different function that draws the next few names
@@ -536,14 +480,12 @@ int main() {
               position = 0;
             }
             drawName(position);
-            previousPosition = position;
           } else if (yVal <= (JOY_CENTER - JOY_DEADZONE) ){ // this is move up
             position--;
             if (position < 0){
               position = 29;
             }
             drawName(position);
-            previousPosition = position;
           }
 
           checkButton = digitalRead(JOY_SEL);
@@ -551,9 +493,53 @@ int main() {
           if (checkButton == LOW){
             Serial.println("button pressed should exit list: ");
             mode = 0;
-            drawMode = 0;
             swapToScreen = 1;
+            Serial.print("Selected restaurant is: ");
+            getRestaurantFast(rest_dist[position].index, &rest);
+            // the below are not the relative x and y coordinates
+            // to teh screen - they're the x and y's on the whole
+            // map
+            Xchosenrest = lon_to_x(rest.lon);
+            Ychosenrest = lat_to_y(rest.lat);
+            if (Xchosenrest - 136 > 0) {
+              mapx = Xchosenrest - 136;
+            }
+            else if (Xchosenrest - 136 <= 0) {
+              mapx = 0;
+              cursorX = 0;
+            }
+            else if (Xchosenrest - 136 >= 1776) {
+              mapx = 1776;
+              // cursorX = Xchosenrest % 240;
+            }
+
+            if (Ychosenrest - 120 > 0) {
+              mapy = Ychosenrest - 120
+            }
+            else if (Ychosenrest - 120 <= 0 ) {
+              mapy = 0;
+              cursory = 0;
+            }
+             else if (Ychosenrest - 120 >= 1808) {
+               mapy = 1808;
+               
+             }
+
+            Serial.print("Xchosenrest: ");
+            Serial.println(Xchosenrest);
+
+            Serial.print("Ychosenrest: ");
+            Serial.println(Ychosenrest);
+            Serial.println(rest.name);
+            // cursorX = ln;
+            // cursorY = lt;
+            // int asesf = manhatten(xposcursor,ln,yposcursor,lt);
+            // Serial.println(asesf);
+            Serial.println(rest_dist[position].index);
+            // pretty sure this delay is still happening
+            // when you're sleecting the restaurant list
             delay(950);
+
           }
           delay (50);
         }
@@ -572,3 +558,7 @@ int main() {
 // AND SAY IF THE XREST VAL IS BETWEEN MAPX AND MAPX + 272,
 // DRAW A CIRCLE ON IT
 // SAME FOR Y
+// AND CAN PROLLY DO SO THAT IF MAPX AND Y WERE 500 500,
+// DO IF REST.LT AND LN WITHIN 500 - 672,
+// LT AND LN - 500 ARE THE SCREEN PIXEL COORDS,
+// DRAW CIRC ON THOSE
