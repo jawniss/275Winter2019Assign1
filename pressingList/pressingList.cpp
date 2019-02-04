@@ -479,8 +479,8 @@ int main() {
         // Serial.print("latitude%231: ");
         // Serial.println(latitude%231);
         // initial cursor position is the middle of the screen
-        cursorX = (DISPLAY_WIDTH - 48 - CURSOR_SIZE)/2;
-        cursorY = (DISPLAY_HEIGHT - CURSOR_SIZE)/2;
+        //cursorX = (DISPLAY_WIDTH - 48 - CURSOR_SIZE)/2;
+        //cursorY = (DISPLAY_HEIGHT - CURSOR_SIZE)/2;
 
         // draw the initial cursor
         redrawCursor(cursorX, cursorY, cursorX, cursorY);
