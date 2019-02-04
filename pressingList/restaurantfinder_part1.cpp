@@ -413,8 +413,6 @@ int main() {
   restaurant rest;
   int checkButton;
   int swapToScreen = 0;
-  Serial.println(mapx);
-  Serial.println(mapy);
   while (true) {
     screentap();
     cursorlocation();
@@ -434,14 +432,11 @@ int main() {
       latitude = lat_to_y(rest.lat);
 
       // the below are not the relative x and y coordinates
-      // to the screen - they're the x and y's on the whole
-      // map
-
+      // to the screen - they're the x and y's on the whole map
       mapx = constrain(mapx, 0, 1776);
       mapy = constrain(mapy, 0, 1808);
       lcd_image_draw(&yegImage, &tft, mapx, mapy, 0, 0,
         MAP_DISP_WIDTH, MAP_DISP_HEIGHT);
-
       // If the screen is currently on the edge of the map, instead of
       // centreing the cursor on middle of screen draw the cursor on the
       // restaurant
