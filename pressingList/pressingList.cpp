@@ -448,8 +448,6 @@ int main() {
       // to teh screen - they're the x and y's on the whole
       // map
 
-      mapx = longitude - 136;
-      mapy = latitude - 120;
       Serial.print("longitude: ");
       Serial.println(longitude);
 
@@ -463,7 +461,8 @@ int main() {
       Serial.println(rest_dist[currentRest].index);
       // pretty sure this delay is still happening
       // when you're sleecting the restaurant list
-
+      constrain(mapx, 0, 2048);
+      constrain(mapy, 0, 2048);
       lcd_image_draw(&yegImage, &tft, mapx, mapy,
         0, 0, MAP_DISP_WIDTH, MAP_DISP_HEIGHT);
 
@@ -553,6 +552,50 @@ int main() {
             mode = 0;
             drawMode = 0;
             swapToScreen = 1;
+            Serial.print("Selected restaurant is: ");
+            getRestaurantFast(rest_dist[position].index, &rest);
+            // the below are not the relative x and y coordinates
+            // to teh screen - they're the x and y's on the whole
+            // map
+            longitude = lon_to_x(rest.lon);
+            latitude = lat_to_y(rest.lat);
+            if (longitude - 136 > 0) {
+              mapx = longitude - 136;
+            }
+            else if (longitude - 136 <= 0) {
+              mapx = 0;
+              cursorX = 0;
+            }
+            else if (longitude - 136 >= 1776) {
+              mapx = 1776;
+              cursorX = 263;
+            }
+
+            if (latitude - 120 > 0) {
+              mapy = latitude - 120;
+            }
+            else if (latitude - 120 <= 0 ) {
+              mapy = 0;
+              cursorY = 0;
+            }
+             else if (latitude - 120 >= 1808) {
+               mapy = 1808;
+               cursorY = 231;
+             }
+
+            Serial.print("longitude: ");
+            Serial.println(longitude);
+
+            Serial.print("latitude: ");
+            Serial.println(latitude);
+            Serial.println(rest.name);
+            // cursorX = ln;
+            // cursorY = lt;
+            // int asesf = manhatten(xposcursor,ln,yposcursor,lt);
+            // Serial.println(asesf);
+            Serial.println(rest_dist[position].index);
+            // pretty sure this delay is still happening
+            // when you're sleecting the restaurant list
             delay(950);
           }
           delay (50);
@@ -567,8 +610,12 @@ int main() {
 
 
 
-// FOR TAPPING THE SCREEN, MAKE IT TO DO THIS: IF IT REGISTERES
-// A TAP, THEN DO THE SAME THING AS SORTING. TAKE MAP X AND mapy
-// AND SAY IF THE XREST VAL IS BETWEEN MAPX AND MAPX + 272,
-// DRAW A CIRCLE ON IT
-// SAME FOR Y
+  // FOR TAPPING THE SCREEN, MAKE IT TO DO THIS: IF IT REGISTERES
+  // A TAP, THEN DO THE SAME THING AS SORTING. TAKE MAP X AND mapy
+  // AND SAY IF THE XREST VAL IS BETWEEN MAPX AND MAPX + 272,
+  // DRAW A CIRCLE ON IT
+  // SAME FOR Y
+  // AND CAN PROLLY DO SO THAT IF MAPX AND Y WERE 500 500,
+  // DO IF REST.LT AND LN WITHIN 500 - 672,
+  // LT AND LN - 500 ARE THE SCREEN PIXEL COORDS,
+  // DRAW CIRC ON THOSE
