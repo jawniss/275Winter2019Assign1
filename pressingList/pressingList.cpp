@@ -451,22 +451,26 @@ void screentap () {
     return;
   }
   Serial.println("Touching");
+  //globalSort();
+
   for (int i = 0; i < 1067; i++) {
     getRestaurantFast(i, &rest);
-    Serial.println(rest.name);
+    //Serial.println(rest.name);
     longitude = lon_to_x(rest.lon);
     latitude = lat_to_y(rest.lat);
-    Serial.println(longitude);
-    Serial.println(latitude);
-    Serial.println(mapx);
-    Serial.println(mapy);
-    Serial.println();
+    //Serial.println(longitude);
+    //Serial.println(latitude);
+    //Serial.println(mapx);
+    //Serial.println(mapy);
+    //Serial.println();
 
-    Serial.println();
+    //Serial.println();
+
+
     if (longitude >= mapx && longitude <= mapx + 263 && latitude >= mapy
     && latitude <= mapy + 231) {
-      Serial.println(rest.name);
-      tft.fillRect(longitude - mapx, latitude - mapy, 3, 3, ILI9341_BLACK);
+      //Serial.println(rest.name);
+      tft.fillCircle(longitude - mapx, latitude - mapy, 4, ILI9341_BLUE);
     }
 
   }
