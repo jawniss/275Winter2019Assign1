@@ -470,7 +470,7 @@ void screentap () {
     if (longitude >= mapx && longitude <= mapx + 263 && latitude >= mapy
     && latitude <= mapy + 231) {
       //Serial.println(rest.name);
-      tft.fillCircle(longitude - mapx, latitude - mapy, 4, ILI9341_BLUE);
+      tft.fillCircle(longitude - mapx-1, latitude - mapy-1, 4, ILI9341_BLUE);
     }
 
   }
