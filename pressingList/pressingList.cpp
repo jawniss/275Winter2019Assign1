@@ -57,6 +57,23 @@ int yposcursor = 0;
 int mapx = 888;
 int mapy = 904;
 
+
+
+
+#define YP A2  // must be an analog pin, use "An" notation!
+#define XM A3  // must be an analog pin, use "An" notation!
+#define YM  5  // can be a digital pin
+#define XP  4  // can be a digital pin
+
+
+TouchScreen ts = TouchScreen(XP, YP, XM, YM, 300);
+
+#define MINPRESSURE   10
+#define MAXPRESSURE 1000
+
+
+
+
 // different than SD
 Sd2Card card;
 
@@ -426,6 +443,39 @@ void globalSort(){
 }
 
 
+
+void screentap () {
+  TSPoint touch = ts.getPoint();
+
+  if (touch.z < MINPRESSURE || touch.z > MAXPRESSURE) {
+    return;
+  }
+  Serial.println("Touching");
+  for (int i = 0; i < 1067; i++) {
+    getRestaurantFast(i, &rest);
+    Serial.println(rest.name);
+    longitude = lon_to_x(rest.lon);
+    latitude = lat_to_y(rest.lat);
+    Serial.println(longitude);
+    Serial.println(latitude);
+    Serial.println(mapx);
+    Serial.println(mapy);
+    Serial.println();
+
+    Serial.println();
+    if (longitude >= mapx && longitude <= mapx + 263 && latitude >= mapy
+    && latitude <= mapy + 231) {
+      Serial.println(rest.name);
+      tft.fillRect(longitude - mapx, latitude - mapy, 3, 3, ILI9341_BLACK);
+    }
+
+  }
+  //delay(500);
+}
+
+
+
+
 int main() {
   setup();
   restaurant rest;
@@ -436,6 +486,7 @@ int main() {
   Serial.println(mapx);
   Serial.println(mapy);
   while (true){
+    screentap();
     cursorlocation();
     processJoystick();
 
