@@ -87,6 +87,8 @@ int mode = 0;
 // drawing the list for first time
 int drawMode = 0;
 
+int lt, ln;
+
 /*
 int xVal;
 int yVal;
@@ -410,11 +412,23 @@ void drawName(uint16_t selectedRest){
   }
 }
 
+void globalSort(){
+  for (int i=0; i < 1067;i++){
+    getRestaurantFast(i, &rest); // first value tells you what restaurant that number is and allows you to look for it directly
+    // what you do is find the manhatten dist of closest one
+    ln = lon_to_x(rest.lon) ;
+    lt = lat_to_y(rest.lat);
+    rest_dist[i].dist = manhatten(xposcursor,ln,yposcursor,lt);
+    rest_dist[i].index = i;
+
+  }
+  isort(rest_dist,NUM_RESTAURANTS);
+}
+
 
 int main() {
   setup();
   restaurant rest;
-  int lt, ln;
   int restaurantCounter;
   int checkButton;
   int swapToScreen = 0;
@@ -479,8 +493,8 @@ int main() {
         // Serial.print("latitude%231: ");
         // Serial.println(latitude%231);
         // initial cursor position is the middle of the screen
-        //cursorX = (DISPLAY_WIDTH - 48 - CURSOR_SIZE)/2;
-        //cursorY = (DISPLAY_HEIGHT - CURSOR_SIZE)/2;
+        cursorX = (DISPLAY_WIDTH - 48 - CURSOR_SIZE)/2;
+        cursorY = (DISPLAY_HEIGHT - CURSOR_SIZE)/2;
 
         // draw the initial cursor
         redrawCursor(cursorX, cursorY, cursorX, cursorY);
@@ -489,16 +503,7 @@ int main() {
 
       if (checkButton == LOW){// button pushed
         Serial.println("button pressed entering list: ");
-        for (int i=0; i < 1067;i++){
-          getRestaurantFast(i, &rest); // first value tells you what restaurant that number is and allows you to look for it directly
-          // what you do is find the manhatten dist of closest one
-          ln = lon_to_x(rest.lon) ;
-          lt = lat_to_y(rest.lat);
-          rest_dist[i].dist = manhatten(xposcursor,ln,yposcursor,lt);
-          rest_dist[i].index = i;
-
-        }
-        isort(rest_dist,NUM_RESTAURANTS);
+        globalSort();
         /*
         for (int i=0; i < 30;i++){
           Serial.print(" this is index: ");
