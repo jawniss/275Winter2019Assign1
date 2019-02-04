@@ -431,6 +431,7 @@ int main() {
 
     if (swapToScreen != 0){
       swapToScreen = 0;
+      tft.fillScreen(ILI9341_BLACK);// draw the screen all black first
       Serial.println("returned properly to map: ");
       // draws the centre of the Edmonton map, leaving the rightmost 48 columns black
 
