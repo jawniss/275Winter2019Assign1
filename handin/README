@@ -1,0 +1,63 @@
+# ----------------------------------------------
+#   Name: Ricky Au, Johnas Wong
+#   ID: 1529429, 1529241
+#   CMPUT 275, Winter 2019
+#
+#   Assignment 1 part 1: Simple version of Restaurant Finder
+# ----------------------------------------------
+Included Files:
+    * retaurant_finder.cpp
+    * README
+    * Makefile
+
+Accessories:
+    * 1 Arduino Mega Board (AMG)
+    * 19 wires
+    * 1 Adafruit ILI9341 (display)
+    * 1 SainSmart JoyStick
+    * 1 micro sd card preloaded with lcd_image.h and lcd_image.cpp
+
+Wiring instructions:
+    Source: Wiring for Adafruit ILI9341 File (on eclass)
+    For Display:
+    Board Pin <---> Arduino Pin
+    ===========================
+    GND       <--->      GND
+    Vin       <--->      5V
+    3Vo                  NOT CONNECTED
+    CLK       <--->      52
+    MISO      <--->      50
+    MOSI      <--->      51
+    CS        <--->      10
+    D/C       <--->       9
+    RST                  NOT CONNECTED
+    Lite                 NOT CONNECTED
+    Y+        <--->      A2 (analog pin)
+    X+        <--->       4  (digital pin)
+    Y-        <--->       5  (digital pin)
+    X-        <--->      A3 (analog pin)
+    IM0 - IM3            NOT CONNECTED (they expect a 3.3v signal, DON'T CONNECT!)
+    CCS       <--->       6
+    CD                   NOT CONNECTED
+
+    For Joy-stick:
+    VRx       <--->       A1
+    VRy       <--->       A0
+    SW        <--->       D2
+
+
+Running Instructions:
+    1) enter the file directory and type "make" into the terminal
+    2) then type "make upload"
+    3) Once the screen displays the map and the red cursor in the middle the user is free to move around
+    4) If the user presses the joystick while in map they see a list of the closest 30 restaurants
+    5) Pressing the joystick again while highlighting a restaurant sends the cursor directly on the restaurant
+    6) If the user presses the screen while in the map blue dots will show up where the restaurants on the screen are
+NOTES:
+    1) Be careful when transitioning through screens at between two sides as the way we have the screen transition it loads
+    and puts you very close to where you were on the map entering the next screen so if you push slightly to the other close
+    side you may move twice.
+    2) When pressing the button when in map it will take roughly 1 second to load so be patient
+Sources:
+    1) Map movement code initially built off solutions for assignment 1 on eclass
+    2) swap function built off eclass quicksort
