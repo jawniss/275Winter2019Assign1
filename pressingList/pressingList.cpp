@@ -473,7 +473,6 @@ int main() {
       }
       // button pushed
       if (checkButton == LOW){
-        Serial.println("button pressed entering list: ");
         globalSort();
         // draw the screen all black first
         tft.fillScreen(ILI9341_BLACK);
@@ -519,27 +518,22 @@ int main() {
             // out of the map bounds, draw the cursor on the closest edge
             if (longitude - 136 > 0) {
               mapx = longitude - 136;
-            }
-            else if (longitude - 136 <= 0) {
+            } else if (longitude - 136 <= 0) {
               mapx = 0;
               cursorX = 0;
-            }
-            else if (longitude - 136 >= 1776) {
+            } else if (longitude - 136 >= 1776) {
               mapx = 1776;
               cursorX = 263;
             }
-
             if (latitude - 120 > 0) {
               mapy = latitude - 120;
-            }
-            else if (latitude - 120 <= 0 ) {
+            } else if (latitude - 120 <= 0 ) {
               mapy = 0;
               cursorY = 0;
-            }
-             else if (latitude - 120 >= 1808) {
+            } else if (latitude - 120 >= 1808) {
                mapy = 1808;
                cursorY = 231;
-             }
+            }
             delay(950);
           }
           delay (50);
@@ -551,15 +545,3 @@ int main() {
 
     return 0;
   }
-
-
-
-  // FOR TAPPING THE SCREEN, MAKE IT TO DO THIS: IF IT REGISTERES
-  // A TAP, THEN DO THE SAME THING AS SORTING. TAKE MAP X AND mapy
-  // AND SAY IF THE XREST VAL IS BETWEEN MAPX AND MAPX + 272,
-  // DRAW A CIRCLE ON IT
-  // SAME FOR Y
-  // AND CAN PROLLY DO SO THAT IF MAPX AND Y WERE 500 500,
-  // DO IF REST.LT AND LN WITHIN 500 - 672,
-  // LT AND LN - 500 ARE THE SCREEN PIXEL COORDS,
-  // DRAW CIRC ON THOSE
