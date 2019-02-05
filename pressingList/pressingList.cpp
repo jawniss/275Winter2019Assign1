@@ -184,9 +184,9 @@ void screenupdate() {
   bool refreshscreen = false;
   mapx = constrain(mapx, 0, 1776);
   mapy = constrain(mapy, 0, 1808);
-  // If the screen is already at a horizontal edge of the map, no need to
+  // If the screen is already at an edge of the map, no need to
   // refresh
-  if (mapx == 0 || mapx == 1776) {
+  if (mapx == 0 || mapx == 1776 || mapy == 0 || mapy == 1808) {
     refreshscreen = false;
   }
   // If the cursor touches the left side, draw the next left patch of map
@@ -212,10 +212,6 @@ void screenupdate() {
       cursorX = 1;
       refreshscreen = true;
     }
-  }
-  // If the screen is at a vertical edge of the map, no need to refresh the map
-  if (mapy == 0 || mapy == 1808) {
-    refreshscreen = false;
   }
   // If the cursor touches the top of the screen relative to the rotation
   // orientation, move a screen up
