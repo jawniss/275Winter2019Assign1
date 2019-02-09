@@ -110,7 +110,9 @@ int mode = 0;
 int drawMode = 0;
 int lt, ln;
 int filterNum = NUM_RESTAURANTS;
-
+bool iSortVal = true;
+bool qSortVal = false;
+bool both = false;
 
 // forward declaration for drawing the cursor
 void redrawCursor(int newX, int newY, int oldX, int oldY);
@@ -145,6 +147,27 @@ void setup() {
 
     // draw the initial cursor
     redrawCursor(cursorX, cursorY, cursorX, cursorY);
+
+    // bottom rectangle button visual
+    tft.fillRect(272,121,48,119, ILI9341_WHITE);
+    tft.drawRect(272,121,48,119, ILI9341_GREEN);
+    // fast written vertically
+    tft.setTextColor(ILI9341_BLACK, ILI9341_WHITE);
+    tft.setCursor(293,141);
+    tft.setTextSize(2);
+    tft.print("I");
+    tft.setCursor(293,158);
+    tft.setTextSize(2);
+    tft.print("S");
+    tft.setCursor(293,175);
+    tft.setTextSize(2);
+    tft.print("O");
+    tft.setCursor(293,192);
+    tft.setTextSize(2);
+    tft.print("R");
+    tft.setCursor(293,209);
+    tft.setTextSize(2);
+    tft.print("T");
 
     tft.setTextSize(1);
     tft.setTextWrap(false);  // roll of the edge and not wrap around
@@ -458,6 +481,90 @@ void globalQSort() {
   quickSort(rest_dist,0,filterNum-1);
 }
 
+void sortButton() {
+  TSPoint touch = ts.getPoint();
+  int16_t screen_x = map(touch.y, MINPRESSURE, MAXPRESSURE, DISPLAY_WIDTH-1, 0);
+  int16_t screen_y = map(touch.x, MINPRESSURE, MAXPRESSURE, 0, DISPLAY_HEIGHT-1);
+  // condition to trigger only if non black side of screen is pressed
+  if(((screen_x >= 260) and (screen_x <= 320)) and ((screen_y >= 121) and (screen_y <= 240))) {
+    if (touch.z < MINPRESSURE || touch.z > MAXPRESSURE) {
+      return;
+    }
+    Serial.println("button pressed");
+    delay(500);
+    if (iSortVal == true){
+      qSortVal = true;
+      iSortVal = false;
+
+      // bottom rectangle button visual
+      tft.fillRect(272,121,48,119, ILI9341_WHITE);
+      tft.drawRect(272,121,48,119, ILI9341_GREEN);
+      // fast written vertically
+      tft.setTextColor(ILI9341_BLACK, ILI9341_WHITE);
+      tft.setCursor(293,141);
+      tft.setTextSize(2);
+      tft.print("Q");
+      tft.setCursor(293,158);
+      tft.setTextSize(2);
+      tft.print("S");
+      tft.setCursor(293,175);
+      tft.setTextSize(2);
+      tft.print("O");
+      tft.setCursor(293,192);
+      tft.setTextSize(2);
+      tft.print("R");
+      tft.setCursor(293,209);
+      tft.setTextSize(2);
+      tft.print("T");
+    }
+    else if (qSortVal == true){
+      both = true;
+      qSortVal = false;
+      // bottom rectangle button visual
+      tft.fillRect(272,121,48,119, ILI9341_WHITE);
+      tft.drawRect(272,121,48,119, ILI9341_GREEN);
+      // fast written vertically
+      tft.setTextColor(ILI9341_BLACK, ILI9341_WHITE);
+      tft.setCursor(293,146);
+      tft.setTextSize(2);
+      tft.print("B");
+      tft.setCursor(293,163);
+      tft.setTextSize(2);
+      tft.print("O");
+      tft.setCursor(293,180);
+      tft.setTextSize(2);
+      tft.print("T");
+      tft.setCursor(293,197);
+      tft.setTextSize(2);
+      tft.print("H");
+    }
+    else if (both == true){
+      iSortVal = true;
+      both = false;
+
+      // bottom rectangle button visual
+      tft.fillRect(272,121,48,119, ILI9341_WHITE);
+      tft.drawRect(272,121,48,119, ILI9341_GREEN);
+      // fast written vertically
+      tft.setTextColor(ILI9341_BLACK, ILI9341_WHITE);
+      tft.setCursor(293,141);
+      tft.setTextSize(2);
+      tft.print("I");
+      tft.setCursor(293,158);
+      tft.setTextSize(2);
+      tft.print("S");
+      tft.setCursor(293,175);
+      tft.setTextSize(2);
+      tft.print("O");
+      tft.setCursor(293,192);
+      tft.setTextSize(2);
+      tft.print("R");
+      tft.setCursor(293,209);
+      tft.setTextSize(2);
+      tft.print("T");
+    }
+  }
+}
 
 // When the screen is touched, display the locations of restaurants on screen
 void screentap() {
@@ -493,6 +600,7 @@ int main() {
   int swapToScreen = 0;
   while (true){
     screentap();
+    sortButton();
     cursorlocation();
     processJoystick();
 
@@ -517,6 +625,70 @@ int main() {
       lcd_image_draw(&yegImage, &tft, mapx, mapy, 0, 0,
         MAP_DISP_WIDTH, MAP_DISP_HEIGHT);
 
+        if (iSortVal == true){
+          // bottom rectangle button visual
+          tft.fillRect(272,121,48,119, ILI9341_WHITE);
+          tft.drawRect(272,121,48,119, ILI9341_GREEN);
+          // fast written vertically
+          tft.setTextColor(ILI9341_BLACK, ILI9341_WHITE);
+          tft.setCursor(293,141);
+          tft.setTextSize(2);
+          tft.print("I");
+          tft.setCursor(293,158);
+          tft.setTextSize(2);
+          tft.print("S");
+          tft.setCursor(293,175);
+          tft.setTextSize(2);
+          tft.print("O");
+          tft.setCursor(293,192);
+          tft.setTextSize(2);
+          tft.print("R");
+          tft.setCursor(293,209);
+          tft.setTextSize(2);
+          tft.print("T");
+        }
+        else if (qSortVal == true){
+          // bottom rectangle button visual
+          tft.fillRect(272,121,48,119, ILI9341_WHITE);
+          tft.drawRect(272,121,48,119, ILI9341_GREEN);
+          // fast written vertically
+          tft.setTextColor(ILI9341_BLACK, ILI9341_WHITE);
+          tft.setCursor(293,141);
+          tft.setTextSize(2);
+          tft.print("Q");
+          tft.setCursor(293,158);
+          tft.setTextSize(2);
+          tft.print("S");
+          tft.setCursor(293,175);
+          tft.setTextSize(2);
+          tft.print("O");
+          tft.setCursor(293,192);
+          tft.setTextSize(2);
+          tft.print("R");
+          tft.setCursor(293,209);
+          tft.setTextSize(2);
+          tft.print("T");
+        }
+        else if (both == true){
+          // bottom rectangle button visual
+          tft.fillRect(272,121,48,119, ILI9341_WHITE);
+          tft.drawRect(272,121,48,119, ILI9341_GREEN);
+          // fast written vertically
+          tft.setTextColor(ILI9341_BLACK, ILI9341_WHITE);
+          tft.setCursor(293,146);
+          tft.setTextSize(2);
+          tft.print("B");
+          tft.setCursor(293,163);
+          tft.setTextSize(2);
+          tft.print("O");
+          tft.setCursor(293,180);
+          tft.setTextSize(2);
+          tft.print("T");
+          tft.setCursor(293,197);
+          tft.setTextSize(2);
+          tft.print("H");
+        }
+
       // If the screen is currently on the edge of the map, instead of
       // centreing the cursor on middle of screen draw the cursor on the
       // restaurant
@@ -537,22 +709,41 @@ int main() {
       }
       // button pushed
       if (checkButton == LOW){
+        if (iSortVal == true){
+          unsigned long startTimeISort = millis();
+          globalISort();
+          unsigned long endTimeISort = millis();
+          unsigned long deltaIsort = endTimeISort-startTimeISort;
+          Serial.print("insertion sort running time: ");
+          Serial.print(deltaIsort);
+          Serial.println(" ms");
+        }
+        else if (qSortVal == true){
+          unsigned long startTimeQSort = millis();
+          globalQSort();
+          unsigned long endTimeQSort = millis();
+          unsigned long deltaQsort = endTimeQSort-startTimeQSort;
+          Serial.print("quick sort running time: ");
+          Serial.print(deltaQsort);
+          Serial.println(" ms");
+        }
+        else if (both == true){
+          unsigned long startTimeISort = millis();
+          globalISort();
+          unsigned long endTimeISort = millis();
+          unsigned long deltaIsort = endTimeISort-startTimeISort;
+          Serial.print("insertion sort running time: ");
+          Serial.print(deltaIsort);
+          Serial.println(" ms");
 
-        unsigned long startTimeQSort = millis();
-        globalQSort();
-        unsigned long endTimeQSort = millis();
-        unsigned long deltaQsort = endTimeQSort-startTimeQSort;
-        Serial.print("quick sort running time: ");
-        Serial.print(deltaQsort);
-        Serial.println(" ms");
-
-        unsigned long startTimeISort = millis();
-        globalISort();
-        unsigned long endTimeISort = millis();
-        unsigned long deltaIsort = endTimeISort-startTimeISort;
-        Serial.print("insertion sort running time: ");
-        Serial.print(deltaIsort);
-        Serial.println(" ms");
+          unsigned long startTimeQSort = millis();
+          globalQSort();
+          unsigned long endTimeQSort = millis();
+          unsigned long deltaQsort = endTimeQSort-startTimeQSort;
+          Serial.print("quick sort running time: ");
+          Serial.print(deltaQsort);
+          Serial.println(" ms");
+        }
 
         // draw the screen all black first
         tft.fillScreen(ILI9341_BLACK);
@@ -596,6 +787,7 @@ int main() {
             newScreenChecker--;
             if (position < 0){
               position = 0;
+              newScreenChecker = 0;
             }
             if ((newScreenChecker < 0) && (position >= 29)){
               newScreenChecker = 29;
