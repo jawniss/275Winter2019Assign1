@@ -4,7 +4,7 @@
 #   ID: 1529429, 1529241
 #   CMPUT 275, Winter 2019
 #
-#   Assignment 1 part 1: Simple version of Restaurant Finder
+#   Assignment 1 part 2: Full version of Restaurant Finder
 # ----------------------------------------------
 */
 
@@ -109,7 +109,10 @@ int mode = 0;
 // drawing the list for first time
 int drawMode = 0;
 int lt, ln;
+// changes the number of restaurants when filtered
 int filterNum = NUM_RESTAURANTS;
+// boolean for based on what sort to use
+// set to isort initially
 bool iSortVal = true;
 bool qSortVal = false;
 bool both = false;
@@ -117,7 +120,7 @@ bool both = false;
 // forward declaration for drawing the cursor
 void redrawCursor(int newX, int newY, int oldX, int oldY);
 
-
+// initialization
 void setup() {
   init();
   Serial.begin(9600);
@@ -148,10 +151,10 @@ void setup() {
     // draw the initial cursor
     redrawCursor(cursorX, cursorY, cursorX, cursorY);
 
-    // bottom rectangle button visual
+    // initial draw when the program is run
     tft.fillRect(272,121,48,119, ILI9341_WHITE);
     tft.drawRect(272,121,48,119, ILI9341_GREEN);
-    // fast written vertically
+    // isort written vertically
     tft.setTextColor(ILI9341_BLACK, ILI9341_WHITE);
     tft.setCursor(293,141);
     tft.setTextSize(2);
@@ -392,8 +395,9 @@ void drawName(uint16_t selectedRest, uint16_t cycle) {
   } else {
     // draw the screen all black first
     tft.fillScreen(ILI9341_BLACK);
-    for (int16_t i = (0+cycle); i < (30+cycle); i ++) {
+    for (int16_t i = (0 + cycle); i < (30 + cycle); i ++) {
       getRestaurantFast(rest_dist[i].index , &rest);
+      // case for if loops further than the number of restaurants
       if (i > (filterNum - 1)){
         tft.setTextColor(ILI9341_BLACK, ILI9341_BLACK);
         tft.println("               ");
@@ -427,6 +431,7 @@ void globalISort() {
   isort(rest_dist, filterNum);
 }
 
+// taken from eclass quicksort.cpp
 /* This function takes last element as pivot, places
 the pivot element at its correct position in sorted
 	array, and places all smaller (smaller than pivot)
@@ -451,6 +456,7 @@ int partition (RestDist dist[], int low, int high)
 	return (i + 1);
 }
 
+// taken from eclass quicksort.cpp
 /* The main function that implements QuickSort
 arr[] --> Array to be sorted,
 low --> Starting index,
@@ -470,6 +476,7 @@ void quickSort(RestDist dist[], int low, int high)
 	}
 }
 
+// function that does the quickSort from scratch
 void globalQSort() {
   for (int i = 0; i < filterNum; i++) {
     getRestaurantFast(i, &rest);
@@ -481,17 +488,21 @@ void globalQSort() {
   quickSort(rest_dist,0,filterNum-1);
 }
 
+// function that if the sorting button on bottom left is pressed uses
 void sortButton() {
   TSPoint touch = ts.getPoint();
   int16_t screen_x = map(touch.y, MINPRESSURE, MAXPRESSURE, DISPLAY_WIDTH-1, 0);
   int16_t screen_y = map(touch.x, MINPRESSURE, MAXPRESSURE, 0, DISPLAY_HEIGHT-1);
-  // condition to trigger only if non black side of screen is pressed
+  // condition to trigger only if the bottom right button is pressed
   if(((screen_x >= 260) and (screen_x <= 320)) and ((screen_y >= 121) and (screen_y <= 240))) {
     if (touch.z < MINPRESSURE || touch.z > MAXPRESSURE) {
       return;
     }
     Serial.println("button pressed");
+    // delay so the button doesn't take in unintended button presses
     delay(500);
+
+    // case to switch to qsort if pressed and currently on isort
     if (iSortVal == true){
       qSortVal = true;
       iSortVal = false;
@@ -499,7 +510,7 @@ void sortButton() {
       // bottom rectangle button visual
       tft.fillRect(272,121,48,119, ILI9341_WHITE);
       tft.drawRect(272,121,48,119, ILI9341_GREEN);
-      // fast written vertically
+      // qsort written vertically
       tft.setTextColor(ILI9341_BLACK, ILI9341_WHITE);
       tft.setCursor(293,141);
       tft.setTextSize(2);
@@ -517,13 +528,14 @@ void sortButton() {
       tft.setTextSize(2);
       tft.print("T");
     }
+    // case to switch to both if pressed and currently on qsort
     else if (qSortVal == true){
       both = true;
       qSortVal = false;
       // bottom rectangle button visual
       tft.fillRect(272,121,48,119, ILI9341_WHITE);
       tft.drawRect(272,121,48,119, ILI9341_GREEN);
-      // fast written vertically
+      // both written vertically
       tft.setTextColor(ILI9341_BLACK, ILI9341_WHITE);
       tft.setCursor(293,146);
       tft.setTextSize(2);
@@ -538,14 +550,14 @@ void sortButton() {
       tft.setTextSize(2);
       tft.print("H");
     }
+    // case to switch to isort if pressed and currently on both
     else if (both == true){
       iSortVal = true;
       both = false;
-
       // bottom rectangle button visual
       tft.fillRect(272,121,48,119, ILI9341_WHITE);
       tft.drawRect(272,121,48,119, ILI9341_GREEN);
-      // fast written vertically
+      // isort written vertically
       tft.setTextColor(ILI9341_BLACK, ILI9341_WHITE);
       tft.setCursor(293,141);
       tft.setTextSize(2);
@@ -604,7 +616,6 @@ int main() {
     cursorlocation();
     processJoystick();
 
-
     checkButton = digitalRead(JOY_SEL);
 
     // swap to screen if condition
@@ -625,11 +636,12 @@ int main() {
       lcd_image_draw(&yegImage, &tft, mapx, mapy, 0, 0,
         MAP_DISP_WIDTH, MAP_DISP_HEIGHT);
 
+        // cases to draw the button that it is returning to
         if (iSortVal == true){
           // bottom rectangle button visual
           tft.fillRect(272,121,48,119, ILI9341_WHITE);
           tft.drawRect(272,121,48,119, ILI9341_GREEN);
-          // fast written vertically
+          // isort written vertically
           tft.setTextColor(ILI9341_BLACK, ILI9341_WHITE);
           tft.setCursor(293,141);
           tft.setTextSize(2);
@@ -648,7 +660,7 @@ int main() {
           tft.print("T");
         }
         else if (qSortVal == true){
-          // bottom rectangle button visual
+          // qsort rectangle button visual
           tft.fillRect(272,121,48,119, ILI9341_WHITE);
           tft.drawRect(272,121,48,119, ILI9341_GREEN);
           // fast written vertically
@@ -673,7 +685,7 @@ int main() {
           // bottom rectangle button visual
           tft.fillRect(272,121,48,119, ILI9341_WHITE);
           tft.drawRect(272,121,48,119, ILI9341_GREEN);
-          // fast written vertically
+          // both written vertically
           tft.setTextColor(ILI9341_BLACK, ILI9341_WHITE);
           tft.setCursor(293,146);
           tft.setTextSize(2);
@@ -709,6 +721,7 @@ int main() {
       }
       // button pushed
       if (checkButton == LOW){
+        // conditions to use the sort values set from map screen
         if (iSortVal == true){
           unsigned long startTimeISort = millis();
           globalISort();
@@ -765,15 +778,18 @@ int main() {
           if (yVal >= (JOY_CENTER + JOY_DEADZONE)){
             position++;
             newScreenChecker++;
+            //clamp the very last position
             if (position > (filterNum - 1)){ // change to value when he gives
               position = (filterNum - 1);
               newScreenChecker = (filterNum % 30); //16 in the case of all since extra 16 restaurant
             }
-            if ((position > ((filterNum - 1)-(filterNum % 30))) && (newScreenChecker> 29)){ // case for last page that is less than 30 (position > 1049)
+            // case for last page that is less than 30 (position > 1049)
+            if ((position > ((filterNum - 1)-(filterNum % 30))) && (newScreenChecker> 29)){
               newScreen = newScreen + 30;
               newScreenChecker = 0;
               drawMode = 0;
             }
+            // conditions for moving to next screen
             if ((newScreenChecker > 29) && (position < ((filterNum - 1)-(filterNum % 30)))){
               newScreenChecker = 0;
               newScreen = newScreen + 30;
@@ -797,6 +813,7 @@ int main() {
             drawName(position,newScreen);
             previousPosition = position;
           }
+
           Serial.print("This is postion: ");
           Serial.println(position);
           Serial.print("This is newScreenChecker: ");
@@ -805,6 +822,7 @@ int main() {
           Serial.println(newScreen);
 
           checkButton = digitalRead(JOY_SEL);
+          // case for if button pressed while in list
           if (checkButton == LOW){
             mode = 0;
             drawMode = 0;

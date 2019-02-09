@@ -3,12 +3,14 @@
 #   ID: 1529429, 1529241
 #   CMPUT 275, Winter 2019
 #
-#   Assignment 1 part 1: Simple version of Restaurant Finder
+#   Assignment 1 part 2: Full version of Restaurant Finder
 # ----------------------------------------------
 Included Files:
     * retaurant_finder.cpp
     * README
     * Makefile
+    * lcd_image.cpp
+    * lcd_image.h
 
 Accessories:
     * 1 Arduino Mega Board (AMG)
@@ -48,11 +50,14 @@ Wiring instructions:
 
 Running Instructions:
     1) enter the file directory and type "make" into the terminal
-    2) then type "make upload"
+    2) then type "make upload && serial-mon"
     3) Once the screen displays the map and the red cursor in the middle the user is free to move around
     4) If the user presses the joystick while in map they see a list of the closest 30 restaurants
     5) Pressing the joystick again while highlighting a restaurant sends the cursor directly on the restaurant
     6) If the user presses the screen while in the map blue dots will show up where the restaurants on the screen are
+    7) If the user presses the bottom right button It will cycle the sorting method used in this order Isort->Qsort->Both->Isort ...
+    8) when the user presses the joystick on the serial-mon the user will see the amout it takes for the selected sorting method, If both is selected both sorts will be ran
+    9) the top right button allows the user to cycle from 1-5 that would limit the restaurants that show up when the screen is pressed or when sorting
 NOTES:
     1) Be careful when transitioning through screens at between two sides as the way we have the screen transition it loads
     and puts you very close to where you were on the map entering the next screen so if you push slightly to the other close
@@ -60,4 +65,5 @@ NOTES:
     2) When pressing the button when in map it will take roughly 1 second to load so be patient
 Sources:
     1) Map movement code initially built off solutions for assignment 1 on eclass
-    2) swap function built off eclass quicksort
+    2) quicksort was built off of eclass quicksort.cpp from CMPUT 274
+    3) swap function built off of eclass quicksort.cpp from CMPUT 274
