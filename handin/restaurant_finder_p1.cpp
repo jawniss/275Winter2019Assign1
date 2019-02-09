@@ -1,4 +1,4 @@
-/*
+globalISort/*
 # ----------------------------------------------
 #   Name: Ricky Au, Johnas Wong
 #   ID: 1529429, 1529241
@@ -383,7 +383,7 @@ void drawName(uint16_t selectedRest) {
 
 // function that takes all restaurants convert to longitude and latitude
 // then sort them
-void globalSort() {
+void globalISort() {
   for (int i = 0; i < 1067; i++) {
     getRestaurantFast(i, &rest);
     ln = lon_to_x(rest.lon);
@@ -473,7 +473,8 @@ int main() {
       }
       // button pushed
       if (checkButton == LOW){
-        globalSort();
+        globalISort();
+
         // draw the screen all black first
         tft.fillScreen(ILI9341_BLACK);
         // always start with first restaurant

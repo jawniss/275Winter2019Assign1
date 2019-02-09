@@ -112,8 +112,8 @@ void getRestaurantFast(int restIndex, restaurant* restPtr) {
 
 // void manhatten(current location x, all restaurantx, current location y, all restauranty){
 int manhatten(int restx, int resty){
-  int currentx = 2048; // comment out these two when you have postion from cursor
-  int currenty = 2048;
+  int currentx = 1024; // comment out these two when you have postion from cursor
+  int currenty = 1024;
   int distance;
   distance = abs(currentx - restx) + abs(currenty - resty);
   return distance;
@@ -159,6 +159,49 @@ void isort(RestDist dist[],int len){
     }
     i = i+1;
   }
+}
+
+/* This function takes last element as pivot, places
+the pivot element at its correct position in sorted
+	array, and places all smaller (smaller than pivot)
+to left of pivot and all greater elements to right
+of pivot */
+int partition (RestDist dist[], int low, int high)
+{
+	int pivot = dist[high].dist; // pivot
+	int i = (low - 1); // Index of smaller element
+
+	for (int j = low; j <= high- 1; j++)
+	{
+		// If current element is smaller than or
+		// equal to pivot
+		if (dist[j].dist <= pivot)
+		{
+			i++; // increment index of smaller element
+			swap(dist[i], dist[j]);
+		}
+	}
+	swap(dist[i + 1], dist[high]);
+	return (i + 1);
+}
+
+/* The main function that implements QuickSort
+arr[] --> Array to be sorted,
+low --> Starting index,
+high --> Ending index */
+void quickSort(RestDist dist[], int low, int high)
+{
+	if (low < high)
+	{
+		/* pi is partitioning index, arr[p] is now
+		at right place */
+		int pi = partition(dist, low, high);
+
+		// Separately sort elements before
+		// partition and after partition
+		quickSort(dist, low, pi - 1);
+		quickSort(dist, pi + 1, high);
+	}
 }
 
 /*
@@ -211,6 +254,7 @@ void drawName(uint16_t selectedRest){
   //tft.print ("\n") ;
 }
 
+/*
 void drawNameP2(uint16_t selectedRest){
   //selectedRest = 0; // which restaurant is selected ?
   tft.setCursor(0,0);
@@ -223,7 +267,7 @@ void drawNameP2(uint16_t selectedRest){
     Serial.println(i);
     Serial.print(" this is selectedRest: ");
     Serial.println(selectedRest);
-    */
+
     if(i == selectedRest){ // highlight
       // white characters on black background
       tft.setTextColor(ILI9341_BLACK, ILI9341_WHITE);
@@ -238,6 +282,7 @@ void drawNameP2(uint16_t selectedRest){
       tft.println("                     ");
     }
 }
+*/
 
 /*
 void displayFirsthalf(){
@@ -279,7 +324,8 @@ int main() {
       */
   }
 
-  isort(rest_dist,NUM_RESTAURANTS);
+  //isort(rest_dist,NUM_RESTAURANTS);
+  quickSort(rest_dist,0,NUM_RESTAURANTS-1);
   // maybe only need to show to 30
   /*
   for (int i=0; i < 30;i++){
