@@ -156,10 +156,10 @@ void setup() {
     redrawCursor(cursorX, cursorY, cursorX, cursorY);
 
     // initial draw when the program is run
-    tft.fillRect(272, 121, 48, 119, ILI9341_WHITE);
-    tft.drawRect(272, 121, 48, 119, ILI9341_GREEN);
-    tft.fillRect(272, 0, 48, 119, ILI9341_WHITE);
-    tft.drawRect(272, 0, 48, 119, ILI9341_RED);
+    tft.fillRect(272,121,48,119, ILI9341_WHITE);
+    tft.drawRect(272,121,48,119, ILI9341_GREEN);
+    tft.fillRect(272,0,48,119, ILI9341_WHITE);
+    tft.drawRect(272,0,48,119, ILI9341_RED);
     // Top button
     tft.setTextColor(ILI9341_BLACK, ILI9341_WHITE);
     tft.setCursor(293, 52);
@@ -167,19 +167,19 @@ void setup() {
     tft.print(rating);
     // isort written vertically
     tft.setTextColor(ILI9341_BLACK, ILI9341_WHITE);
-    tft.setCursor(293, 141);
+    tft.setCursor(293,141);
     tft.setTextSize(2);
     tft.print("I");
-    tft.setCursor(293, 158);
+    tft.setCursor(293,158);
     tft.setTextSize(2);
     tft.print("S");
-    tft.setCursor(293, 175);
+    tft.setCursor(293,175);
     tft.setTextSize(2);
     tft.print("O");
-    tft.setCursor(293, 192);
+    tft.setCursor(293,192);
     tft.setTextSize(2);
     tft.print("R");
-    tft.setCursor(293, 209);
+    tft.setCursor(293,209);
     tft.setTextSize(2);
     tft.print("T");
 
@@ -350,7 +350,7 @@ int16_t lat_to_y (int32_t lat) {
 
 
 // swap function similar to eclass quicksort.cpp that swaps two inputs
-void swap(RestDist& dist,RestDist& dist2) {
+void swap(RestDist& dist,RestDist& dist2){
   RestDist temp = dist;
   dist = dist2;
   dist2 = temp;
@@ -380,7 +380,7 @@ void drawName(uint16_t selectedRest, uint16_t cycle) {
   tft.setCursor(0, 0);
   tft.setTextSize(1);
   // if already drawn don't redraw whole thing
-  if (drawMode != 0) {
+  if (drawMode!= 0) {
     // if you moved in list mode
     if (previousPosition != selectedRest) {
       for (int16_t i = (0 + cycle); i < (30 + cycle); i++) {
@@ -406,13 +406,14 @@ void drawName(uint16_t selectedRest, uint16_t cycle) {
   } else {
     // draw the screen all black first
     tft.fillScreen(ILI9341_BLACK);
-    for (int16_t i = (0 + cycle); i < (30 + cycle); i++) {
+    for (int16_t i = (0 + cycle); i < (30 + cycle); i ++) {
       getRestaurantFast(rest_dist[i].index , &rest);
       // case for if loops further than the number of restaurants
       if (i > (filterNum - 1)){
         tft.setTextColor(ILI9341_BLACK, ILI9341_BLACK);
         tft.println("               ");
-      } else {
+      }
+      else{
         if (i == selectedRest) {  // highlight
           // black characters on white background
           tft.setTextColor(ILI9341_BLACK, ILI9341_WHITE);
@@ -433,15 +434,18 @@ the pivot element at its correct position in sorted
 	array, and places all smaller (smaller than pivot)
 to left of pivot and all greater elements to right
 of pivot */
-int partition (RestDist dist[], int low, int high) {
-	int pivot = dist[high].dist;  // pivot
-	int i = (low - 1);  // Index of smaller element
+int partition (RestDist dist[], int low, int high)
+{
+	int pivot = dist[high].dist; // pivot
+	int i = (low - 1); // Index of smaller element
 
-	for (int j = low; j <= high- 1; j++) {
+	for (int j = low; j <= high- 1; j++)
+	{
 		// If current element is smaller than or
 		// equal to pivot
-		if (dist[j].dist <= pivot) {
-			i++;  // increment index of smaller element
+		if (dist[j].dist <= pivot)
+		{
+			i++; // increment index of smaller element
 			swap(dist[i], dist[j]);
 		}
 	}
@@ -454,8 +458,10 @@ int partition (RestDist dist[], int low, int high) {
 arr[] --> Array to be sorted,
 low --> Starting index,
 high --> Ending index */
-void quickSort(RestDist dist[], int low, int high) {
-	if (low < high) {
+void quickSort(RestDist dist[], int low, int high)
+{
+	if (low < high)
+	{
 		/* pi is partitioning index, arr[p] is now
 		at right place */
 		int pi = partition(dist, low, high);
@@ -467,86 +473,89 @@ void quickSort(RestDist dist[], int low, int high) {
 	}
 }
 
-
 // function that if the sorting button on bottom left is pressed uses
 void sortButton() {
   TSPoint touch = ts.getPoint();
   int16_t screen_x = map(touch.y, MINPRESSURE, MAXPRESSURE, DISPLAY_WIDTH-1, 0);
   int16_t screen_y = map(touch.x, MINPRESSURE, MAXPRESSURE, 0, DISPLAY_HEIGHT-1);
   // condition to trigger only if the bottom right button is pressed
-  if(((screen_x >= 260) && (screen_x <= 320)) && ((screen_y >= 121) && (screen_y <= 240))) {
+  if(((screen_x >= 260) and (screen_x <= 320)) and ((screen_y >= 121) and (screen_y <= 240))) {
     if (touch.z < MINPRESSURE || touch.z > MAXPRESSURE) {
       return;
     }
     // delay so the button doesn't take in unintended button presses
     delay(500);
+
     // case to switch to qsort if pressed and currently on isort
-    if (iSortVal == true) {
+    if (iSortVal == true){
       qSortVal = true;
       iSortVal = false;
+
       // bottom rectangle button visual
-      tft.fillRect(272, 121, 48, 119, ILI9341_WHITE);
-      tft.drawRect(272, 121, 48, 119, ILI9341_GREEN);
+      tft.fillRect(272,121,48,119, ILI9341_WHITE);
+      tft.drawRect(272,121,48,119, ILI9341_GREEN);
       // qsort written vertically
       tft.setTextColor(ILI9341_BLACK, ILI9341_WHITE);
-      tft.setCursor(293, 141);
+      tft.setCursor(293,141);
       tft.setTextSize(2);
       tft.print("Q");
-      tft.setCursor(293, 158);
+      tft.setCursor(293,158);
       tft.setTextSize(2);
       tft.print("S");
-      tft.setCursor(293, 175);
+      tft.setCursor(293,175);
       tft.setTextSize(2);
       tft.print("O");
-      tft.setCursor(293, 192);
+      tft.setCursor(293,192);
       tft.setTextSize(2);
       tft.print("R");
-      tft.setCursor(293, 209);
+      tft.setCursor(293,209);
       tft.setTextSize(2);
       tft.print("T");
+    }
     // case to switch to both if pressed and currently on qsort
-    } else if (qSortVal == true) {
+    else if (qSortVal == true){
       both = true;
       qSortVal = false;
       // bottom rectangle button visual
-      tft.fillRect(272, 121, 48, 119, ILI9341_WHITE);
-      tft.drawRect(272, 121, 48, 119, ILI9341_GREEN);
+      tft.fillRect(272,121,48,119, ILI9341_WHITE);
+      tft.drawRect(272,121,48,119, ILI9341_GREEN);
       // both written vertically
       tft.setTextColor(ILI9341_BLACK, ILI9341_WHITE);
-      tft.setCursor(293, 146);
+      tft.setCursor(293,146);
       tft.setTextSize(2);
       tft.print("B");
-      tft.setCursor(293, 163);
+      tft.setCursor(293,163);
       tft.setTextSize(2);
       tft.print("O");
-      tft.setCursor(293, 180);
+      tft.setCursor(293,180);
       tft.setTextSize(2);
       tft.print("T");
-      tft.setCursor(293, 197);
+      tft.setCursor(293,197);
       tft.setTextSize(2);
       tft.print("H");
-      // case to switch to isort if pressed and currently on both
-    } else if (both == true) {
+    }
+    // case to switch to isort if pressed and currently on both
+    else if (both == true){
       iSortVal = true;
       both = false;
       // bottom rectangle button visual
-      tft.fillRect(272, 121, 48, 119, ILI9341_WHITE);
-      tft.drawRect(272, 121, 48, 119, ILI9341_GREEN);
+      tft.fillRect(272,121,48,119, ILI9341_WHITE);
+      tft.drawRect(272,121,48,119, ILI9341_GREEN);
       // isort written vertically
       tft.setTextColor(ILI9341_BLACK, ILI9341_WHITE);
-      tft.setCursor(293, 141);
+      tft.setCursor(293,141);
       tft.setTextSize(2);
       tft.print("I");
-      tft.setCursor(293, 158);
+      tft.setCursor(293,158);
       tft.setTextSize(2);
       tft.print("S");
-      tft.setCursor(293, 175);
+      tft.setCursor(293,175);
       tft.setTextSize(2);
       tft.print("O");
-      tft.setCursor(293, 192);
+      tft.setCursor(293,192);
       tft.setTextSize(2);
       tft.print("R");
-      tft.setCursor(293, 209);
+      tft.setCursor(293,209);
       tft.setTextSize(2);
       tft.print("T");
     }
@@ -588,7 +597,7 @@ void ratingselector() {
   TSPoint touch = ts.getPoint();
   int16_t screen_x = map(touch.y, MINPRESSURE, MAXPRESSURE, DISPLAY_WIDTH-1, 0);
   int16_t screen_y = map(touch.x, MINPRESSURE, MAXPRESSURE, 0, DISPLAY_HEIGHT-1);
-  if (((screen_x >= 260) && (screen_x <= 320)) && ((screen_y >= 0) && (screen_y <= 120))) {
+  if (((screen_x >= 260) and (screen_x <= 320)) and ((screen_y >= 0) and (screen_y <= 120))) {
     if (touch.z < MINPRESSURE || touch.z > MAXPRESSURE) {
       return;
     }
@@ -598,7 +607,8 @@ void ratingselector() {
     filterNum = 0;
     if (rating >= 1 && rating <= 4) {
       rating++;
-    } else if (rating >= 5) {
+    }
+    else if (rating >= 5) {
       rating = 1;
     }
     tft.setCursor(293, 52);
@@ -639,7 +649,7 @@ int main() {
   int restaurantCounter;
   int checkButton;
   int swapToScreen = 0;
-  while (true) {
+  while (true){
     ratingselector();
     screentap();
     sortButton();
@@ -649,7 +659,7 @@ int main() {
     checkButton = digitalRead(JOY_SEL);
 
     // swap to screen if condition
-    if (swapToScreen != 0) {
+    if (swapToScreen != 0){
       swapToScreen = 0;
       tft.fillScreen(ILI9341_BLACK);// draw the screen all black first
 
@@ -667,96 +677,92 @@ int main() {
         MAP_DISP_WIDTH, MAP_DISP_HEIGHT);
 
         // cases to draw the button that it is returning to
-        if (iSortVal == true) {
+        if (iSortVal == true){
           // Redraw the 'rating' button with whatever the selected rating value
           // was
-          tft.fillRect(272, 0, 48, 119, ILI9341_WHITE);
-          tft.drawRect(272, 0, 48, 119, ILI9341_RED);
+          tft.fillRect(272,0,48,119, ILI9341_WHITE);
+          tft.drawRect(272,0,48,119, ILI9341_RED);
           tft.setTextColor(ILI9341_BLACK, ILI9341_WHITE);
           tft.setCursor(293, 52);
           tft.setTextSize(2);
           tft.print(rating);
           // bottom rectangle button visual
-          tft.fillRect(272, 121, 48, 119, ILI9341_WHITE);
-          tft.drawRect(272, 121, 48, 119, ILI9341_GREEN);
+          tft.fillRect(272,121,48,119, ILI9341_WHITE);
+          tft.drawRect(272,121,48,119, ILI9341_GREEN);
           // isort written vertically
           tft.setTextColor(ILI9341_BLACK, ILI9341_WHITE);
-          tft.setCursor(293, 141);
+          tft.setCursor(293,141);
           tft.setTextSize(2);
           tft.print("I");
-          tft.setCursor(293, 158);
+          tft.setCursor(293,158);
           tft.setTextSize(2);
           tft.print("S");
-          tft.setCursor(293, 175);
+          tft.setCursor(293,175);
           tft.setTextSize(2);
           tft.print("O");
-          tft.setCursor(293, 192);
+          tft.setCursor(293,192);
           tft.setTextSize(2);
           tft.print("R");
-          tft.setCursor(293, 209);
+          tft.setCursor(293,209);
           tft.setTextSize(2);
           tft.print("T");
-        } else if (qSortVal == true) {
+        }
+        else if (qSortVal == true){
           // Redraw the 'rating' button with whatever the selected rating value
           // was
-          tft.fillRect(272, 0, 48, 119, ILI9341_WHITE);
-          tft.drawRect(272, 0, 48, 119, ILI9341_RED);
+          tft.fillRect(272,0,48,119, ILI9341_WHITE);
+          tft.drawRect(272,0,48,119, ILI9341_RED);
           tft.setTextColor(ILI9341_BLACK, ILI9341_WHITE);
           tft.setCursor(293, 52);
           tft.setTextSize(2);
           tft.print(rating);
           // qsort rectangle button visual
-          tft.fillRect(272, 121, 48, 119, ILI9341_WHITE);
-          tft.drawRect(272, 121, 48, 119, ILI9341_GREEN);
+          tft.fillRect(272,121,48,119, ILI9341_WHITE);
+          tft.drawRect(272,121,48,119, ILI9341_GREEN);
           // fast written vertically
           tft.setTextColor(ILI9341_BLACK, ILI9341_WHITE);
-          tft.setCursor(293, 141);
+          tft.setCursor(293,141);
           tft.setTextSize(2);
           tft.print("Q");
-          tft.setCursor(293, 158);
+          tft.setCursor(293,158);
           tft.setTextSize(2);
           tft.print("S");
-          tft.setCursor(293, 175);
+          tft.setCursor(293,175);
           tft.setTextSize(2);
           tft.print("O");
-          tft.setCursor(293, 192);
+          tft.setCursor(293,192);
           tft.setTextSize(2);
           tft.print("R");
-          tft.setCursor(293, 209);
+          tft.setCursor(293,209);
           tft.setTextSize(2);
           tft.print("T");
-        } else if (both == true) {
+        }
+        else if (both == true){
           // Redraw the 'rating' button with whatever the selected rating value
           // was
-          tft.fillRect(272, 0, 48, 119, ILI9341_WHITE);
-          tft.drawRect(272, 0, 48, 119, ILI9341_RED);
+          tft.fillRect(272,0,48,119, ILI9341_WHITE);
+          tft.drawRect(272,0,48,119, ILI9341_RED);
           tft.setTextColor(ILI9341_BLACK, ILI9341_WHITE);
           tft.setCursor(293, 52);
           tft.setTextSize(2);
           tft.print(rating);
           // bottom rectangle button visual
-          tft.fillRect(272, 121, 48, 119, ILI9341_WHITE);
-          tft.drawRect(272, 121, 48, 119, ILI9341_GREEN);
+          tft.fillRect(272,121,48,119, ILI9341_WHITE);
+          tft.drawRect(272,121,48,119, ILI9341_GREEN);
           // both written vertically
           tft.setTextColor(ILI9341_BLACK, ILI9341_WHITE);
-          tft.setCursor(293, 146);
+          tft.setCursor(293,146);
           tft.setTextSize(2);
           tft.print("B");
-          tft.setCursor(293, 163);
+          tft.setCursor(293,163);
           tft.setTextSize(2);
           tft.print("O");
-          tft.setCursor(293, 180);
+          tft.setCursor(293,180);
           tft.setTextSize(2);
           tft.print("T");
-          tft.setCursor(293, 197);
+          tft.setCursor(293,197);
           tft.setTextSize(2);
           tft.print("H");
-        }
-        for (int i=0; i < filterNum; i++) {
-          Serial.print(" this is index: ");
-          Serial.print(rest_dist[i].index);
-          Serial.print("    this is rest_dist: ");
-          Serial.println(rest_dist[i].dist);
         }
 
       // If the screen is currently on the edge of the map, instead of
@@ -778,7 +784,7 @@ int main() {
         redrawCursor(cursorX, cursorY, cursorX, cursorY);
       }
       // button pushed
-      if (checkButton == LOW) {
+      if (checkButton == LOW){
         // conditions to use the sort values set from map screen
         if (iSortVal == true) {
           restsaboverating();
@@ -786,7 +792,9 @@ int main() {
           isort(rest_dist, filterNum);
           unsigned long endTimeISort = millis();
           unsigned long deltaIsort = endTimeISort-startTimeISort;
-          Serial.print("insertion sort running time: ");
+          Serial.print("isort ");
+          Serial.print(filterNum);
+          Serial.print(" restaurants: ");
           Serial.print(deltaIsort);
           Serial.println(" ms");
         } else if (qSortVal == true) {
@@ -795,7 +803,9 @@ int main() {
           quickSort(rest_dist, 0, filterNum-1);
           unsigned long endTimeQSort = millis();
           unsigned long deltaQsort = endTimeQSort - startTimeQSort;
-          Serial.print("quick sort running time: ");
+          Serial.print("qsort ");
+          Serial.print(filterNum);
+          Serial.print(" restaurants: ");
           Serial.print(deltaQsort);
           Serial.println(" ms");
         } else if (both == true) {
@@ -804,7 +814,9 @@ int main() {
           isort(rest_dist, filterNum);
           unsigned long endTimeISort = millis();
           unsigned long deltaIsort = endTimeISort - startTimeISort;
-          Serial.print("insertion sort running time: ");
+          Serial.print("isort ");
+          Serial.print(filterNum);
+          Serial.print(" restaurants: ");
           Serial.print(deltaIsort);
           Serial.println(" ms");
           restsaboverating();
@@ -812,10 +824,22 @@ int main() {
           quickSort(rest_dist, 0, filterNum-1);
           unsigned long endTimeQSort = millis();
           unsigned long deltaQsort = endTimeQSort - startTimeQSort;
-          Serial.print("quick sort running time: ");
+          Serial.print("qsort ");
+          Serial.print(filterNum);
+          Serial.print(" restaurants: ");
           Serial.print(deltaQsort);
           Serial.println(" ms");
         }
+        /*
+        for (int i=0; i < filterNum;i++){
+          Serial.print(" this is index: ");
+          Serial.print(rest_dist[i].index);
+          Serial.print("    this is rest_dist: ");
+          Serial.println(rest_dist[i].dist);
+        }
+        Serial.print("this is filterNum: ");
+        Serial.println(filterNum);
+*/
         // draw the screen all black first
         tft.fillScreen(ILI9341_BLACK);
         // always start with first restaurant
@@ -825,55 +849,63 @@ int main() {
         mode = 1;
         drawMode = 0;
         previousPosition = position;
-        drawName(position, newScreen);
-        while (mode != 0) {
+        drawName(position,newScreen);
+        while(mode!=0){
           // if statement for if its on the 16- blank names go to a different
           // function that draws the next few names
           // reread the joystick everytime to check if a valid tilt is inputed
           int yVal = analogRead(JOY_VERT);
           int buttonVal = digitalRead(JOY_SEL);
           // this is to move down
-          if (yVal >= (JOY_CENTER + JOY_DEADZONE)) {
+          if (yVal >= (JOY_CENTER + JOY_DEADZONE)){
             position++;
             newScreenChecker++;
-            // clamp the very last position
-            if (position > (filterNum - 1)) { // change to value when he gives
+            //clamp the very last position
+            if (position > (filterNum - 1)){ // change to value when he gives
               position = (filterNum - 1);
-              newScreenChecker = (filterNum % 30); // 16 in the case of all since extra 16 restaurant
+              newScreenChecker = (filterNum % 30); //16 in the case of all since extra 16 restaurant
             }
             // case for last page that is less than 30 (position > 1049)
-            if ((position > ((filterNum - 1)-(filterNum % 30))) && (newScreenChecker > 29)) {
+            if ((position > ((filterNum - 1)-(filterNum % 30))) && (newScreenChecker> 29)){
               newScreen = newScreen + 30;
               newScreenChecker = 0;
               drawMode = 0;
             }
             // conditions for moving to next screen
-            if ((newScreenChecker > 29) && (position < ((filterNum - 1) - (filterNum % 30)))) {
+            if ((newScreenChecker > 29) && (position < ((filterNum - 1)-(filterNum % 30)))){
               newScreenChecker = 0;
               newScreen = newScreen + 30;
               drawMode = 0;
             }
-            drawName(position, newScreen);
+            drawName(position,newScreen);
             previousPosition = position;
             // this is move up
-          } else if (yVal <= (JOY_CENTER - JOY_DEADZONE)) {
+          } else if (yVal <= (JOY_CENTER - JOY_DEADZONE) ){
             position--;
             newScreenChecker--;
-            if (position < 0) {
+            if (position < 0){
               position = 0;
               newScreenChecker = 0;
             }
-            if ((newScreenChecker < 0) && (position >= 29)) {
+            if ((newScreenChecker < 0) && (position >= 29)){
               newScreenChecker = 29;
               newScreen = newScreen - 30;
               drawMode = 0;
             }
-            drawName(position, newScreen);
+            drawName(position,newScreen);
             previousPosition = position;
           }
+
+          //Serial.print("This is postion: ");
+          //Serial.println(position);
+          //Serial.print("This is newScreenChecker: ");
+          //Serial.println(newScreenChecker);
+          //Serial.print("This is newscreen: ");
+          //Serial.println(newScreen);
+
           checkButton = digitalRead(JOY_SEL);
           // case for if button pressed while in list
-          if (checkButton == LOW) {
+          if (checkButton == LOW){
             mode = 0;
             drawMode = 0;
             swapToScreen = 1;
@@ -884,25 +916,30 @@ int main() {
             // out of the map bounds, draw the cursor on the closest edge
             if (longitude - 136 > 0) {
               mapx = longitude - 136;
-            } else if (longitude - 136 <= 0) {
+            }
+            else if (longitude - 136 <= 0) {
               mapx = 0;
               cursorX = 0;
-            } else if (longitude - 136 >= 1776) {
+            }
+            else if (longitude - 136 >= 1776) {
               mapx = 1776;
               cursorX = 263;
             }
+
             if (latitude - 120 > 0) {
               mapy = latitude - 120;
-            } else if (latitude - 120 <= 0) {
+            }
+            else if (latitude - 120 <= 0 ) {
               mapy = 0;
               cursorY = 0;
-            } else if (latitude - 120 >= 1808) {
+            }
+             else if (latitude - 120 >= 1808) {
                mapy = 1808;
                cursorY = 231;
              }
             delay(950);
           }
-          delay(50);
+          delay (50);
         }
       }
     }
