@@ -667,12 +667,6 @@ int main() {
 
     // swap to screen if condition
     if (swapToScreen != 0){
-      tft.fillRect(272,0,48,119, ILI9341_WHITE);
-      tft.drawRect(272,0,48,119, ILI9341_RED);
-      tft.setTextColor(ILI9341_BLACK, ILI9341_WHITE);
-      tft.setCursor(293, 52);
-      tft.setTextSize(2);
-      tft.print(rating);
       swapToScreen = 0;
       tft.fillScreen(ILI9341_BLACK);// draw the screen all black first
 
@@ -691,6 +685,12 @@ int main() {
 
         // cases to draw the button that it is returning to
         if (iSortVal == true){
+          tft.fillRect(272,0,48,119, ILI9341_WHITE);
+          tft.drawRect(272,0,48,119, ILI9341_RED);
+          tft.setTextColor(ILI9341_BLACK, ILI9341_WHITE);
+          tft.setCursor(293, 52);
+          tft.setTextSize(2);
+          tft.print(rating);
           // bottom rectangle button visual
           tft.fillRect(272,121,48,119, ILI9341_WHITE);
           tft.drawRect(272,121,48,119, ILI9341_GREEN);
@@ -713,6 +713,12 @@ int main() {
           tft.print("T");
         }
         else if (qSortVal == true){
+          tft.fillRect(272,0,48,119, ILI9341_WHITE);
+          tft.drawRect(272,0,48,119, ILI9341_RED);
+          tft.setTextColor(ILI9341_BLACK, ILI9341_WHITE);
+          tft.setCursor(293, 52);
+          tft.setTextSize(2);
+          tft.print(rating);
           // qsort rectangle button visual
           tft.fillRect(272,121,48,119, ILI9341_WHITE);
           tft.drawRect(272,121,48,119, ILI9341_GREEN);
@@ -735,6 +741,12 @@ int main() {
           tft.print("T");
         }
         else if (both == true){
+          tft.fillRect(272,0,48,119, ILI9341_WHITE);
+          tft.drawRect(272,0,48,119, ILI9341_RED);
+          tft.setTextColor(ILI9341_BLACK, ILI9341_WHITE);
+          tft.setCursor(293, 52);
+          tft.setTextSize(2);
+          tft.print(rating);
           // bottom rectangle button visual
           tft.fillRect(272,121,48,119, ILI9341_WHITE);
           tft.drawRect(272,121,48,119, ILI9341_GREEN);
