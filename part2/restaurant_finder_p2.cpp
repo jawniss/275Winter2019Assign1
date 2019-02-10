@@ -428,20 +428,6 @@ void drawName(uint16_t selectedRest, uint16_t cycle) {
   }
 }
 
-
-// function that takes all restaurants convert to longitude and latitude
-// then sort them
-void globalISort() {
-  for (int i = 0; i < filterNum; i++) {
-    getRestaurantFast(i, &rest);
-    ln = lon_to_x(rest.lon);
-    lt = lat_to_y(rest.lat);
-    rest_dist[i].dist = manhatten(xposcursor, ln, yposcursor, lt);
-    rest_dist[i].index = i;
-  }
-  isort(rest_dist, filterNum);
-}
-
 // taken from eclass quicksort.cpp
 /* This function takes last element as pivot, places
 the pivot element at its correct position in sorted
@@ -487,18 +473,6 @@ void quickSort(RestDist dist[], int low, int high)
 	}
 }
 
-// function that does the quickSort from scratch
-void globalQSort() {
-  for (int i = 0; i < filterNum; i++) {
-    getRestaurantFast(i, &rest);
-    ln = lon_to_x(rest.lon);
-    lt = lat_to_y(rest.lat);
-    rest_dist[i].dist = manhatten(xposcursor, ln, yposcursor, lt);
-    rest_dist[i].index = i;
-  }
-  quickSort(rest_dist,0,filterNum-1);
-}
-
 // function that if the sorting button on bottom left is pressed uses
 void sortButton() {
   TSPoint touch = ts.getPoint();
@@ -509,7 +483,6 @@ void sortButton() {
     if (touch.z < MINPRESSURE || touch.z > MAXPRESSURE) {
       return;
     }
-    Serial.println("button pressed");
     // delay so the button doesn't take in unintended button presses
     delay(500);
 
@@ -604,10 +577,10 @@ void screentap() {
       getRestaurantFast(i, &rest);
       int scale10rating = rest.rating;
       int newscalerating = max(((scale10rating + 1)/2), 1);
-      Serial.println("OG rating");
-      Serial.println(scale10rating);
-      Serial.print("New rating");
-      Serial.println(newscalerating);
+      //Serial.println("OG rating");
+      //Serial.println(scale10rating);
+      //Serial.print("New rating");
+      //Serial.println(newscalerating);
       if (newscalerating >= rating) {
         longitude = lon_to_x(rest.lon);
         latitude = lat_to_y(rest.lat);
@@ -655,10 +628,10 @@ void restsaboverating() {
     getRestaurantFast(i, &rest);
     int scale10rating = rest.rating;
     int newscalerating = max(((scale10rating + 1)/2), 1);
-    Serial.print("OG rating");
-    Serial.println(scale10rating);
-    Serial.print("New rating");
-    Serial.println(newscalerating);
+    //Serial.print("OG rating");
+    //Serial.println(scale10rating);
+    //Serial.print("New rating");
+    //Serial.println(newscalerating);
     if (newscalerating >= rating) {
       filterNum++;
       rest_dist[i].index = i;
@@ -793,8 +766,9 @@ int main() {
       if (checkButton == LOW){
         // conditions to use the sort values set from map screen
         if (iSortVal == true){
+          restsaboverating();
           unsigned long startTimeISort = millis();
-          globalISort();
+          isort(rest_dist, filterNum);
           unsigned long endTimeISort = millis();
           unsigned long deltaIsort = endTimeISort-startTimeISort;
           Serial.print("insertion sort running time: ");
@@ -802,8 +776,9 @@ int main() {
           Serial.println(" ms");
         }
         else if (qSortVal == true){
+          restsaboverating();
           unsigned long startTimeQSort = millis();
-          globalQSort();
+          quickSort(rest_dist,0,filterNum-1);
           unsigned long endTimeQSort = millis();
           unsigned long deltaQsort = endTimeQSort-startTimeQSort;
           Serial.print("quick sort running time: ");
@@ -811,21 +786,30 @@ int main() {
           Serial.println(" ms");
         }
         else if (both == true){
+          restsaboverating();
           unsigned long startTimeISort = millis();
-          globalISort();
+          isort(rest_dist, filterNum);
           unsigned long endTimeISort = millis();
           unsigned long deltaIsort = endTimeISort-startTimeISort;
           Serial.print("insertion sort running time: ");
           Serial.print(deltaIsort);
           Serial.println(" ms");
 
+          restsaboverating();
           unsigned long startTimeQSort = millis();
-          globalQSort();
+          quickSort(rest_dist,0,filterNum-1);
           unsigned long endTimeQSort = millis();
           unsigned long deltaQsort = endTimeQSort-startTimeQSort;
           Serial.print("quick sort running time: ");
           Serial.print(deltaQsort);
           Serial.println(" ms");
+        }
+
+        for (int i=0; i < filterNum;i++){
+          Serial.print(" this is index: ");
+          Serial.print(rest_dist[i].index);
+          Serial.print("    this is rest_dist: ");
+          Serial.println(rest_dist[i].dist);
         }
 
         // draw the screen all black first
@@ -884,12 +868,12 @@ int main() {
             previousPosition = position;
           }
 
-          Serial.print("This is postion: ");
-          Serial.println(position);
-          Serial.print("This is newScreenChecker: ");
-          Serial.println(newScreenChecker);
-          Serial.print("This is newscreen: ");
-          Serial.println(newScreen);
+          //Serial.print("This is postion: ");
+          //Serial.println(position);
+          //Serial.print("This is newScreenChecker: ");
+          //Serial.println(newScreenChecker);
+          //Serial.print("This is newscreen: ");
+          //Serial.println(newScreen);
 
           checkButton = digitalRead(JOY_SEL);
           // case for if button pressed while in list
