@@ -633,11 +633,11 @@ void restsaboverating() {
     if (newscalerating >= rating) {
       filterNum++;
       rest_dist[restdistindex].index = i;
-      restdistindex++;
       ln = lon_to_x(rest.lon);
       lt = lat_to_y(rest.lat);
       distance = manhatten(xposcursor, ln, yposcursor, lt);
       rest_dist[restdistindex].dist = distance;
+      restdistindex++;
     }
   }
 }
@@ -763,6 +763,12 @@ int main() {
           tft.setCursor(293,197);
           tft.setTextSize(2);
           tft.print("H");
+        }
+        for (int i=0; i < filterNum;i++){
+          Serial.print(" this is index: ");
+          Serial.print(rest_dist[i].index);
+          Serial.print("    this is rest_dist: ");
+          Serial.println(rest_dist[i].dist);
         }
 
       // If the screen is currently on the edge of the map, instead of
