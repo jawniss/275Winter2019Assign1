@@ -67,6 +67,10 @@ int yposcursor = 0;
 int mapx = 888;
 int mapy = 904;
 
+// Global variable for rating value and number of restaurants above the rating
+// The intial minimum restaurant rating is 1
+int rating = 1;
+
 // Pin definings from the lecture code for screen touching
 #define YP A2  // must be an analog pin, use "An" notation!
 #define XM A3  // must be an analog pin, use "An" notation!
@@ -154,6 +158,13 @@ void setup() {
     // initial draw when the program is run
     tft.fillRect(272,121,48,119, ILI9341_WHITE);
     tft.drawRect(272,121,48,119, ILI9341_GREEN);
+    tft.fillRect(272,0,48,119, ILI9341_WHITE);
+    tft.drawRect(272,0,48,119, ILI9341_RED);
+    // Top button
+    tft.setTextColor(ILI9341_BLACK, ILI9341_WHITE);
+    tft.setCursor(293, 52);
+    tft.setTextSize(2);
+    tft.print("1");
     // isort written vertically
     tft.setTextColor(ILI9341_BLACK, ILI9341_WHITE);
     tft.setCursor(293,141);
@@ -591,17 +602,74 @@ void screentap() {
     // current screen, draw a circle on the location
     for (int i = 0; i < 1067; i++) {
       getRestaurantFast(i, &rest);
-      longitude = lon_to_x(rest.lon);
-      latitude = lat_to_y(rest.lat);
-      // Check if the restaurant is within the screen display
-      if (longitude >= mapx && longitude <= mapx + 263 && latitude >= mapy
-      && latitude <= mapy + 231) {
-        tft.fillCircle(longitude - mapx - 1, latitude - mapy - 1,
-          4, ILI9341_BLUE);
+      int scale10rating = rest.rating;
+      int newscalerating = max(((scale10rating + 1)/2), 1);
+      Serial.println("OG rating");
+      Serial.println(scale10rating);
+      Serial.print("New rating");
+      Serial.println(newscalerating);
+      if (newscalerating >= rating) {
+        longitude = lon_to_x(rest.lon);
+        latitude = lat_to_y(rest.lat);
+        // Check if the restaurant is within the screen display
+        if (longitude >= mapx && longitude <= mapx + 263 && latitude >= mapy
+        && latitude <= mapy + 231) {
+          tft.fillCircle(longitude - mapx - 1, latitude - mapy - 1,
+            4, ILI9341_BLUE);
+        }
       }
     }
   }
 }
+
+
+void ratingselector() {
+  TSPoint touch = ts.getPoint();
+  int16_t screen_x = map(touch.y, MINPRESSURE, MAXPRESSURE, DISPLAY_WIDTH-1, 0);
+  int16_t screen_y = map(touch.x, MINPRESSURE, MAXPRESSURE, 0, DISPLAY_HEIGHT-1);
+  // condition to trigger only if non black side of screen is pressed
+  if (((screen_x >= 260) and (screen_x <= 320)) and ((screen_y >= 0) and (screen_y <= 120))) {
+    if (touch.z < MINPRESSURE || touch.z > MAXPRESSURE) {
+      return;
+    }
+    Serial.println("Rating pressed");
+    delay(500);
+    // reseting ratingnum number
+    filterNum = 0;
+    if (rating >= 1 && rating <= 4) {
+      rating++;
+    }
+    else if (rating >= 5) {
+      rating = 1;
+    }
+    tft.setCursor(293, 52);
+    tft.setTextSize(2);
+    tft.print(rating);
+  }
+}
+
+
+void restsaboverating() {
+  for (int i = 0; i < 1067; i++) {
+    getRestaurantFast(i, &rest);
+    int scale10rating = rest.rating;
+    int newscalerating = max(((scale10rating + 1)/2), 1);
+    Serial.print("OG rating");
+    Serial.println(scale10rating);
+    Serial.print("New rating");
+    Serial.println(newscalerating);
+    if (newscalerating >= rating) {
+      filterNum++;
+      rest_dist[i].index = i;
+    }
+    // if the specific rests also needed, i can do
+    // just rest_dist[i].index = i
+    // just leave the dist unassigned?
+
+  }
+}
+
+
 
 
 int main() {
@@ -611,6 +679,7 @@ int main() {
   int checkButton;
   int swapToScreen = 0;
   while (true){
+    ratingselector();
     screentap();
     sortButton();
     cursorlocation();
