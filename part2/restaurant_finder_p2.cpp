@@ -577,10 +577,6 @@ void screentap() {
       getRestaurantFast(i, &rest);
       int scale10rating = rest.rating;
       int newscalerating = max(((scale10rating + 1)/2), 1);
-      //Serial.println("OG rating");
-      //Serial.println(scale10rating);
-      //Serial.print("New rating");
-      //Serial.println(newscalerating);
       if (newscalerating >= rating) {
         longitude = lon_to_x(rest.lon);
         latitude = lat_to_y(rest.lat);
@@ -596,18 +592,18 @@ void screentap() {
 }
 
 
+// Update the rating button if it's pressed
 void ratingselector() {
   TSPoint touch = ts.getPoint();
   int16_t screen_x = map(touch.y, MINPRESSURE, MAXPRESSURE, DISPLAY_WIDTH-1, 0);
   int16_t screen_y = map(touch.x, MINPRESSURE, MAXPRESSURE, 0, DISPLAY_HEIGHT-1);
-  // condition to trigger only if non black side of screen is pressed
   if (((screen_x >= 260) and (screen_x <= 320)) and ((screen_y >= 0) and (screen_y <= 120))) {
     if (touch.z < MINPRESSURE || touch.z > MAXPRESSURE) {
       return;
     }
     Serial.println("Rating pressed");
     delay(500);
-    // reseting ratingnum number
+    // resetting number of restaurants that meet the rating
     filterNum = 0;
     if (rating >= 1 && rating <= 4) {
       rating++;
@@ -621,8 +617,12 @@ void ratingselector() {
   }
 }
 
-
+// Converts the 0-10 scale ratings of the restaurants to the new 1-5 scale
+// and only stores the restaurants that meet the rating into the rest_dist
+// array
 void restsaboverating() {
+  // Making sure to reset the temp varaibles in case the rating value was
+  // changed
   filterNum = 0;
   int restdistindex = 0;
   int distance;
@@ -630,10 +630,6 @@ void restsaboverating() {
     getRestaurantFast(i, &rest);
     int scale10rating = rest.rating;
     int newscalerating = max(((scale10rating + 1)/2), 1);
-    //Serial.print("OG rating");
-    //Serial.println(scale10rating);
-    //Serial.print("New rating");
-    //Serial.println(newscalerating);
     if (newscalerating >= rating) {
       filterNum++;
       rest_dist[restdistindex].index = i;
@@ -641,17 +637,10 @@ void restsaboverating() {
       ln = lon_to_x(rest.lon);
       lt = lat_to_y(rest.lat);
       distance = manhatten(xposcursor, ln, yposcursor, lt);
-      // do the distance calculation here and then store it to
       rest_dist[restdistindex].dist = distance;
     }
-    // if the specific rests also needed, i can do
-    // just rest_dist[i].index = i
-    // just leave the dist unassigned?
-
   }
 }
-
-
 
 
 int main() {
@@ -689,6 +678,8 @@ int main() {
 
         // cases to draw the button that it is returning to
         if (iSortVal == true){
+          // Redraw the 'rating' button with whatever the selected rating value
+          // was
           tft.fillRect(272,0,48,119, ILI9341_WHITE);
           tft.drawRect(272,0,48,119, ILI9341_RED);
           tft.setTextColor(ILI9341_BLACK, ILI9341_WHITE);
@@ -717,6 +708,8 @@ int main() {
           tft.print("T");
         }
         else if (qSortVal == true){
+          // Redraw the 'rating' button with whatever the selected rating value
+          // was
           tft.fillRect(272,0,48,119, ILI9341_WHITE);
           tft.drawRect(272,0,48,119, ILI9341_RED);
           tft.setTextColor(ILI9341_BLACK, ILI9341_WHITE);
@@ -745,6 +738,8 @@ int main() {
           tft.print("T");
         }
         else if (both == true){
+          // Redraw the 'rating' button with whatever the selected rating value
+          // was
           tft.fillRect(272,0,48,119, ILI9341_WHITE);
           tft.drawRect(272,0,48,119, ILI9341_RED);
           tft.setTextColor(ILI9341_BLACK, ILI9341_WHITE);
@@ -830,14 +825,6 @@ int main() {
           Serial.print(deltaQsort);
           Serial.println(" ms");
         }
-
-        for (int i=0; i < filterNum;i++){
-          Serial.print(" this is index: ");
-          Serial.print(rest_dist[i].index);
-          Serial.print("    this is rest_dist: ");
-          Serial.println(rest_dist[i].dist);
-        }
-
         // draw the screen all black first
         tft.fillScreen(ILI9341_BLACK);
         // always start with first restaurant
