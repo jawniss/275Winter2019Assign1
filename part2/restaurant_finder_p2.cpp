@@ -625,6 +625,7 @@ void ratingselector() {
 void restsaboverating() {
   filterNum = 0;
   int restdistindex = 0;
+  int distance;
   for (int i = 0; i < 1067; i++) {
     getRestaurantFast(i, &rest);
     int scale10rating = rest.rating;
@@ -637,8 +638,11 @@ void restsaboverating() {
       filterNum++;
       rest_dist[restdistindex].index = i;
       restdistindex++;
+      ln = lon_to_x(rest.lon);
+      lt = lat_to_y(rest.lat);
+      distance = manhatten(xposcursor, ln, yposcursor, lt);
       // do the distance calculation here and then store it to
-      //rest_dist[restdistindex].dist = distance
+      rest_dist[restdistindex].dist = distance;
     }
     // if the specific rests also needed, i can do
     // just rest_dist[i].index = i
