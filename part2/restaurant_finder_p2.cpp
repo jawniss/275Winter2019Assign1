@@ -485,12 +485,10 @@ void sortButton() {
     }
     // delay so the button doesn't take in unintended button presses
     delay(500);
-
     // case to switch to qsort if pressed and currently on isort
     if (iSortVal == true){
       qSortVal = true;
       iSortVal = false;
-
       // bottom rectangle button visual
       tft.fillRect(272,121,48,119, ILI9341_WHITE);
       tft.drawRect(272,121,48,119, ILI9341_GREEN);
@@ -591,7 +589,6 @@ void screentap() {
   }
 }
 
-
 // Update the rating button if it's pressed
 void ratingselector() {
   TSPoint touch = ts.getPoint();
@@ -601,7 +598,6 @@ void ratingselector() {
     if (touch.z < MINPRESSURE || touch.z > MAXPRESSURE) {
       return;
     }
-    Serial.println("Rating pressed");
     delay(500);
     // resetting number of restaurants that meet the rating
     filterNum = 0;
@@ -642,7 +638,6 @@ void restsaboverating() {
   }
 }
 
-
 int main() {
   setup();
   restaurant rest;
@@ -655,27 +650,23 @@ int main() {
     sortButton();
     cursorlocation();
     processJoystick();
-
     checkButton = digitalRead(JOY_SEL);
-
     // swap to screen if condition
     if (swapToScreen != 0){
       swapToScreen = 0;
-      tft.fillScreen(ILI9341_BLACK);// draw the screen all black first
-
+      // draw the screen all black first
+      tft.fillScreen(ILI9341_BLACK);
       // call the selected restaurant
       getRestaurantFast(rest_dist[position].index, &rest);
       // obtain longitude and latitude of selected restaurant
       longitude = lon_to_x(rest.lon);
       latitude = lat_to_y(rest.lat);
-
       // the below are not the relative x and y coordinates
       // to the screen - they're the x and y's on the whole map
       mapx = constrain(mapx, 0, 1776);
       mapy = constrain(mapy, 0, 1808);
       lcd_image_draw(&yegImage, &tft, mapx, mapy, 0, 0,
         MAP_DISP_WIDTH, MAP_DISP_HEIGHT);
-
         // cases to draw the button that it is returning to
         if (iSortVal == true){
           // Redraw the 'rating' button with whatever the selected rating value
@@ -830,16 +821,7 @@ int main() {
           Serial.print(deltaQsort);
           Serial.println(" ms");
         }
-        /*
-        for (int i=0; i < filterNum;i++){
-          Serial.print(" this is index: ");
-          Serial.print(rest_dist[i].index);
-          Serial.print("    this is rest_dist: ");
-          Serial.println(rest_dist[i].dist);
-        }
-        Serial.print("this is filterNum: ");
-        Serial.println(filterNum);
-*/
+
         // draw the screen all black first
         tft.fillScreen(ILI9341_BLACK);
         // always start with first restaurant
@@ -861,11 +843,11 @@ int main() {
             position++;
             newScreenChecker++;
             //clamp the very last position
-            if (position > (filterNum - 1)){ // change to value when he gives
+            if (position > (filterNum - 1)){
               position = (filterNum - 1);
               newScreenChecker = (filterNum % 30); //16 in the case of all since extra 16 restaurant
             }
-            // case for last page that is less than 30 (position > 1049)
+            // case for last page that is less than 30
             if ((position > ((filterNum - 1)-(filterNum % 30))) && (newScreenChecker> 29)){
               newScreen = newScreen + 30;
               newScreenChecker = 0;
@@ -895,13 +877,6 @@ int main() {
             drawName(position,newScreen);
             previousPosition = position;
           }
-
-          //Serial.print("This is postion: ");
-          //Serial.println(position);
-          //Serial.print("This is newScreenChecker: ");
-          //Serial.println(newScreenChecker);
-          //Serial.print("This is newscreen: ");
-          //Serial.println(newScreen);
 
           checkButton = digitalRead(JOY_SEL);
           // case for if button pressed while in list
