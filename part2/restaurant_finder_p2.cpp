@@ -650,6 +650,7 @@ void ratingselector() {
 
 
 void restsaboverating() {
+  filterNum = 0;
   for (int i = 0; i < 1067; i++) {
     getRestaurantFast(i, &rest);
     int scale10rating = rest.rating;
