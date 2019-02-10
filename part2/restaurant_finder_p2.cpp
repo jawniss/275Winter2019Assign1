@@ -164,7 +164,7 @@ void setup() {
     tft.setTextColor(ILI9341_BLACK, ILI9341_WHITE);
     tft.setCursor(293, 52);
     tft.setTextSize(2);
-    tft.print("1");
+    tft.print(rating);
     // isort written vertically
     tft.setTextColor(ILI9341_BLACK, ILI9341_WHITE);
     tft.setCursor(293,141);
@@ -624,6 +624,7 @@ void ratingselector() {
 
 void restsaboverating() {
   filterNum = 0;
+  int restdistindex = 0;
   for (int i = 0; i < 1067; i++) {
     getRestaurantFast(i, &rest);
     int scale10rating = rest.rating;
@@ -634,7 +635,10 @@ void restsaboverating() {
     //Serial.println(newscalerating);
     if (newscalerating >= rating) {
       filterNum++;
-      rest_dist[i].index = i;
+      rest_dist[restdistindex].index = i;
+      restdistindex++;
+      // do the distance calculation here and then store it to
+      //rest_dist[restdistindex].dist = distance
     }
     // if the specific rests also needed, i can do
     // just rest_dist[i].index = i
@@ -663,6 +667,12 @@ int main() {
 
     // swap to screen if condition
     if (swapToScreen != 0){
+      tft.fillRect(272,0,48,119, ILI9341_WHITE);
+      tft.drawRect(272,0,48,119, ILI9341_RED);
+      tft.setTextColor(ILI9341_BLACK, ILI9341_WHITE);
+      tft.setCursor(293, 52);
+      tft.setTextSize(2);
+      tft.print(rating);
       swapToScreen = 0;
       tft.fillScreen(ILI9341_BLACK);// draw the screen all black first
 
